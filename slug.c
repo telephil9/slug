@@ -1,5 +1,4 @@
 #include "a.h"
-#include "colors.h"
 
 Mousectl *mc;
 Keyboardctl *kc;
@@ -23,18 +22,6 @@ ldraw(lua_State *L)
 		return;
 	lua_call(L, 0, 0);
 	drawcanvas();
-}
-
-Image*
-getcolor(int n)
-{
-	if(n < 0)
-		n = 0;
-	if(n >= nelem(palette))
-		n = nelem(palette) - 1;
-	if(palette[n].i == nil)
-		palette[n].i = allocimage(display, Rect(0, 0, 1, 1), screen->chan, 1, palette[n].color);
-	return palette[n].i;
 }
 
 void

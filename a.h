@@ -8,21 +8,14 @@
 #include <lauxlib.h>
 #include <lualib.h>
 
-typedef struct Color Color;
-
-struct Color
-{
-	ulong color;
-	Image *i;
-};
-
 void	resize(lua_State*, int, int);
 
 void	drawcanvas(void);
 void	initstate(void);
 void	registerfuncs(lua_State*);
 
-Image*	getcolor(int);
+Image*	color(int, int, int);
+Image*	grayscale(int);
 
 extern int drawing;
 extern Image* canvas;

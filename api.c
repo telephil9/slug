@@ -47,14 +47,36 @@ csize(lua_State *L)
 	return 0;
 }
 
+Image*
+getcolor(lua_State *L)
+{
+	Image *i;
+	int c, r, g, b;
+
+	c = lua_gettop(L);
+	if(c == 1){
+		g = luaL_checkinteger(L, 1);
+		i = grayscale(g);
+	}else if(c == 3){
+		r = luaL_checkinteger(L, 1);
+		g = luaL_checkinteger(L, 2);
+		b = luaL_checkinteger(L, 3);
+		i = color(r, g, b);
+	}else{
+		fprint(2, "invalid color request\n");
+		return nil;
+	}
+	return i;
+}
+
 int
 cbackground(lua_State *L)
 {
 	Image *i;
-	int n;
 
-	n = luaL_checkinteger(L, 1);
-	i = getcolor(n);
+	i = getcolor(L);
+	if(i == nil)
+		return 1;
 	draw(canvas, canvas->r, i, nil, ZP);
 	return 0;
 }
@@ -69,10 +91,12 @@ cnostroke(lua_State*)
 int
 cstroke(lua_State *L)
 {
-	int n;
+	Image *i;
 
-	n = luaL_checkinteger(L, 1);
-	stroke = getcolor(n);
+	i = getcolor(L);
+	if(i == nil)
+		return 1;
+	stroke = i;
 	nostroke = 0;
 	return 0;
 }
@@ -87,10 +111,12 @@ cnofill(lua_State*)
 int
 cfill(lua_State *L)
 {
-	int n;
+	Image *i;
 
-	n = luaL_checkinteger(L, 1);
-	fill = getcolor(n);
+	i = getcolor(L);
+	if(i == nil)
+		return 1;
+	fill = i;
 	nofill = 0;
 	return 0;
 }
