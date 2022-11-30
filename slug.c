@@ -21,8 +21,12 @@ struct Color
 lua_State *L;
 Mousectl *mc;
 Keyboardctl *kc;
-Image *fg;
+
+int nostroke;
+Image *stroke;
 int strokewidth;
+int nofill;
+Image *fill;
 
 void
 lsetup(void)
@@ -69,14 +73,41 @@ cbackground(lua_State *L)
 }
 
 int
+cnostroke(lua_State*)
+{
+	nostroke = 1;
+	return 0;
+}
+
+int
 cstroke(lua_State *L)
 {
 	int n;
 
 	n = luaL_checkinteger(L, 1);
-	fg = getcolor(n);
+	stroke = getcolor(n);
+	nostroke = 0;
 	return 0;
 }
+
+int
+cnofill(lua_State*)
+{
+	nofill = 1;
+	return 0;
+}
+
+int
+cfill(lua_State *L)
+{
+	int n;
+
+	n = luaL_checkinteger(L, 1);
+	fill = getcolor(n);
+	nofill = 0;
+	return 0;
+}
+
 
 int
 cstrokewidth(lua_State *L)
@@ -100,15 +131,19 @@ cline(lua_State *L)
 	y2 = luaL_checkinteger(L, 4);
 	p1 = addpt(screen->r.min, Pt(x1, y1));
 	p2 = addpt(screen->r.min, Pt(x2, y2));
-	line(screen, p1, p2, 0, 0, strokewidth, fg, ZP);
+	if(!nostroke)
+		line(screen, p1, p2, 0, 0, strokewidth, stroke, ZP);
 	return 0;
 }
 
 void
 initcontext(void)
 {
-	fg = display->black;
+	nostroke = 0;
+	stroke = display->black;
 	strokewidth = 1;
+	nofill = 0;
+	fill = display->white;
 }
 
 void
@@ -122,8 +157,11 @@ void
 registerfuncs(void)
 {
 	registerfunc("background", cbackground);
+	registerfunc("noStroke", cnostroke);
 	registerfunc("stroke", cstroke);
 	registerfunc("strokeWidth", cstrokewidth);
+	registerfunc("noFill", cnofill);
+	registerfunc("fill", cfill);
 	registerfunc("line", cline);
 }
 
