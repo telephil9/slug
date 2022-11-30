@@ -3,8 +3,8 @@
 BIN=/$objtype/bin
 TARG=slug
 LIB=lua/liblua.a.$O
-HFILES=
-OFILES=slug.$O
+HFILES=a.h
+OFILES=slug.$O api.$O
 
 </sys/src/cmd/mkone
 
