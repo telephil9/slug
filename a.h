@@ -16,8 +16,10 @@ struct Color
 	Image *i;
 };
 
+void	drawcanvas(void);
 void	initstate(void);
 void	registerfuncs(lua_State*);
 
 Image*	getcolor(int);
 
+extern Image* canvas;

@@ -1,5 +1,6 @@
 #include "a.h"
 
+Image *canvas;
 int nostroke;
 Image *stroke;
 int strokewidth;
@@ -9,11 +10,22 @@ Image *fill;
 void
 initstate(void)
 {
+	Rectangle r;
+
+	r = rectsubpt(screen->r, screen->r.min);
+	canvas = allocimage(display, r, screen->chan, 0, DNofill);
 	nostroke = 0;
 	stroke = display->black;
 	strokewidth = 1;
 	nofill = 0;
 	fill = display->white;
+}
+
+void
+drawcanvas(void)
+{
+	draw(screen, screen->r, canvas, nil, ZP);
+	flushimage(display, 1);
 }
 
 int
@@ -24,7 +36,7 @@ cbackground(lua_State *L)
 
 	n = luaL_checkinteger(L, 1);
 	i = getcolor(n);
-	draw(screen, screen->r, i, nil, ZP);
+	draw(canvas, canvas->r, i, nil, ZP);
 	return 0;
 }
 
@@ -85,10 +97,10 @@ cline(lua_State *L)
 	y1 = luaL_checkinteger(L, 2);
 	x2 = luaL_checkinteger(L, 3);
 	y2 = luaL_checkinteger(L, 4);
-	p1 = addpt(screen->r.min, Pt(x1, y1));
-	p2 = addpt(screen->r.min, Pt(x2, y2));
+	p1 = Pt(x1, y1);
+	p2 = Pt(x2, y2);
 	if(!nostroke)
-		line(screen, p1, p2, 0, 0, strokewidth, stroke, ZP);
+		line(canvas, p1, p2, 0, 0, strokewidth, stroke, ZP);
 	return 0;
 }
 
@@ -102,13 +114,13 @@ csquare(lua_State *L)
 	x = luaL_checkinteger(L, 1);
 	y = luaL_checkinteger(L, 2);
 	w = luaL_checkinteger(L, 3);
-	p1 = addpt(screen->r.min, Pt(x, y));
+	p1 = Pt(x, y);
 	p2 = addpt(p1, Pt(w, w));
 	r = Rpt(p1, p2);
 	if(!nofill)
-		draw(screen, r, fill, nil, ZP);
+		draw(canvas, r, fill, nil, ZP);
 	if(!nostroke)
-		border(screen, r, strokewidth, stroke, ZP);
+		border(canvas, r, strokewidth, stroke, ZP);
 	return 0;
 }
 
@@ -123,13 +135,13 @@ crect(lua_State *L)
 	y = luaL_checkinteger(L, 2);
 	w = luaL_checkinteger(L, 3);
 	h = luaL_checkinteger(L, 4);
-	p1 = addpt(screen->r.min, Pt(x, y));
+	p1 = Pt(x, y);
 	p2 = addpt(p1, Pt(w, h));
 	r = Rpt(p1, p2);
 	if(!nofill)
-		draw(screen, r, fill, nil, ZP);
+		draw(canvas, r, fill, nil, ZP);
 	if(!nostroke)
-		border(screen, r, strokewidth, stroke, ZP);
+		border(canvas, r, strokewidth, stroke, ZP);
 	return 0;
 }
 
@@ -142,11 +154,11 @@ ccircle(lua_State *L)
 	x = luaL_checkinteger(L, 1);
 	y = luaL_checkinteger(L, 2);
 	a = luaL_checkinteger(L, 3);
-	p = addpt(screen->r.min, Pt(x, y));
+	p = Pt(x, y);
 	if(!nofill)
-		fillellipse(screen, p, a, a, fill, ZP);
+		fillellipse(canvas, p, a, a, fill, ZP);
 	if(!nostroke)
-		ellipse(screen, p, a, a, strokewidth, stroke, ZP);
+		ellipse(canvas, p, a, a, strokewidth, stroke, ZP);
 	return 0;
 }
 
@@ -160,11 +172,11 @@ cellipse(lua_State *L)
 	y = luaL_checkinteger(L, 2);
 	a = luaL_checkinteger(L, 3);
 	b = luaL_checkinteger(L, 4);
-	p = addpt(screen->r.min, Pt(x, y));
+	p = Pt(x, y);
 	if(!nofill)
-		fillellipse(screen, p, a, b, fill, ZP);
+		fillellipse(canvas, p, a, b, fill, ZP);
 	if(!nostroke)
-		ellipse(screen, p, a, b, strokewidth, stroke, ZP);
+		ellipse(canvas, p, a, b, strokewidth, stroke, ZP);
 	return 0;
 }
 
@@ -180,11 +192,11 @@ carc(lua_State *L)
 	b = luaL_checkinteger(L, 4);
 	c = luaL_checkinteger(L, 5);
 	d = luaL_checkinteger(L, 6);
-	p = addpt(screen->r.min, Pt(x, y));
+	p = Pt(x, y);
 	if(!nofill)
-		fillarc(screen, p, a, b, fill, ZP, c, d);
+		fillarc(canvas, p, a, b, fill, ZP, c, d);
 	if(!nostroke)
-		arc(screen, p, a, b, strokewidth, stroke, ZP, c, d);
+		arc(canvas, p, a, b, strokewidth, stroke, ZP, c, d);
 	return 0;
 }
 

@@ -11,7 +11,7 @@ lsetup(lua_State *L)
 	if(!lua_isfunction(L, -1))
 		return;
 	lua_call(L, 0, 0);
-	flushimage(display, 1);
+	drawcanvas();
 }
 
 void
@@ -21,7 +21,7 @@ ldraw(lua_State *L)
 	if(!lua_isfunction(L, -1))
 		return;
 	lua_call(L, 0, 0);
-	flushimage(display, 1);
+	drawcanvas();
 }
 
 Image*
