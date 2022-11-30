@@ -200,6 +200,29 @@ carc(lua_State *L)
 	return 0;
 }
 
+int
+ctriangle(lua_State *L)
+{
+	Point p[4];
+	int x1, y1, x2, y2, x3, y3;
+
+	x1 = luaL_checkinteger(L, 1);
+	y1 = luaL_checkinteger(L, 2);
+	x2 = luaL_checkinteger(L, 3);
+	y2 = luaL_checkinteger(L, 4);
+	x3 = luaL_checkinteger(L, 5);
+	y3 = luaL_checkinteger(L, 6);
+	p[0] = Pt(x1, y1);
+	p[1] = Pt(x2, y2);
+	p[2] = Pt(x3, y3);
+	p[3] = p[0];
+	if(!nofill)
+		fillpoly(canvas, p, 3, 0, fill, ZP);
+	if(!nostroke)
+		poly(canvas, p, 4, 0, 0, strokewidth, stroke, ZP);
+	return 0;
+}
+
 void
 registerfunc(lua_State *L, const char *name, int(*f)(lua_State*))
 {
@@ -222,5 +245,6 @@ registerfuncs(lua_State *L)
 	registerfunc(L, "circle", ccircle);
 	registerfunc(L, "ellipse", cellipse);
 	registerfunc(L, "arc", carc);
+	registerfunc(L, "triangle", ctriangle);
 }
 
