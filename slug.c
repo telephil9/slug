@@ -3,6 +3,7 @@
 
 Mousectl *mc;
 Keyboardctl *kc;
+int drawing;
 
 void
 lsetup(lua_State *L)
@@ -86,7 +87,9 @@ threadmain(int argc, char *argv[])
 	registerfuncs(L);
 	initstate();
 	resize(width, height);
+	drawing = 0;
 	lsetup(L);
+	drawing = 1;
 	for(;;){
 		ldraw(L);
 		switch(alt(alts)){

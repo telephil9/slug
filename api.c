@@ -33,6 +33,21 @@ drawcanvas(void)
 }
 
 int
+csize(lua_State *L)
+{
+	int w, h;
+
+	w = luaL_checkinteger(L, 1);
+	h = luaL_checkinteger(L, 2);
+	if(drawing)
+		return 0;
+	width = w;
+	height = h;
+	resize(w, h);
+	return 0;
+}
+
+int
 cbackground(lua_State *L)
 {
 	Image *i;
@@ -237,6 +252,7 @@ registerfunc(lua_State *L, const char *name, int(*f)(lua_State*))
 void
 registerfuncs(lua_State *L)
 {
+	registerfunc(L, "size", csize);
 	registerfunc(L, "background", cbackground);
 	registerfunc(L, "noStroke", cnostroke);
 	registerfunc(L, "stroke", cstroke);

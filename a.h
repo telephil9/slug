@@ -24,6 +24,7 @@ void	registerfuncs(lua_State*);
 
 Image*	getcolor(int);
 
+extern int drawing;
 extern Image* canvas;
 extern int width;
 extern int height;
