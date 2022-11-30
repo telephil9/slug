@@ -135,6 +135,21 @@ cstrokewidth(lua_State *L)
 }
 
 int
+cpoint(lua_State *L)
+{
+	Point p1, p2;
+	int x, y;
+
+	x = luaL_checkinteger(L, 1);
+	y = luaL_checkinteger(L, 2);
+	p1 = addpt(origin, Pt(x, y));
+	p2 = addpt(p1, Pt(strokewidth, strokewidth));
+	if(!nostroke)
+		draw(canvas, Rpt(p1, p2), stroke, nil, ZP);
+	return 0;
+}
+
+int
 cline(lua_State *L)
 {
 	Point p1, p2;
@@ -297,6 +312,7 @@ registerfuncs(lua_State *L)
 	registerfunc(L, "strokeWidth", cstrokewidth);
 	registerfunc(L, "noFill", cnofill);
 	registerfunc(L, "fill", cfill);
+	registerfunc(L, "point", cpoint);
 	registerfunc(L, "line", cline);
 	registerfunc(L, "square", csquare);
 	registerfunc(L, "rect", crect);
