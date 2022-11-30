@@ -16,7 +16,7 @@ struct Color
 	Image *i;
 };
 
-void	resize(int, int);
+void	resize(lua_State*, int, int);
 
 void	drawcanvas(void);
 void	initstate(void);

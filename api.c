@@ -43,7 +43,7 @@ csize(lua_State *L)
 		return 0;
 	width = w;
 	height = h;
-	resize(w, h);
+	resize(L, w, h);
 	return 0;
 }
 

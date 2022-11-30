@@ -38,7 +38,7 @@ getcolor(int n)
 }
 
 void
-resize(int w, int h)
+resize(lua_State *L, int w, int h)
 {
 	int fd, n;
 	char buf[255];
@@ -50,6 +50,10 @@ resize(int w, int h)
 	if(write(fd, buf, n) != n)
 		fprint(2, "write error: %r\n");
 	close(fd);
+	lua_pushnumber(L, w);
+	lua_setglobal(L, "width");
+	lua_pushnumber(L, h);
+	lua_setglobal(L, "height");
 }
 
 void
@@ -86,7 +90,7 @@ threadmain(int argc, char *argv[])
 	}
 	registerfuncs(L);
 	initstate();
-	resize(width, height);
+	resize(L, width, height);
 	drawing = 0;
 	lsetup(L);
 	drawing = 1;
@@ -98,7 +102,7 @@ threadmain(int argc, char *argv[])
 		case 1:
 			if(getwindow(display, Refnone)<0)
 				sysfatal("getwindow: %r");
-			resize(width, height);
+			resize(L, width, height);
 			drawcanvas();
 			break;
 		case 2:
