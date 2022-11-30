@@ -31,7 +31,7 @@ color(int r, int g, int b)
 
 	c = nil;
 	n = (r << 24) | (g << 16) | (b << 8) | 0xFF;
-	for(i = 0; i < ncolors; i++){
+	for(i = 0; i < nelem(cache); i++){
 		if(cache[i].n == n){
 			c = cache[i].i;
 			break;
@@ -42,6 +42,8 @@ color(int r, int g, int b)
 		cache[ncolors].n = n;
 		cache[ncolors].i = c;
 		ncolors++;
+		if(ncolors == nelem(cache))
+			ncolors = 0;
 	}
 	return c;
 }
