@@ -37,13 +37,30 @@ getcolor(int n)
 }
 
 void
+resize(int w, int h)
+{
+	int fd, n;
+	char buf[255];
+
+	fd = open("/dev/wctl", OWRITE|OCEXEC);
+	if(fd < 0)
+		sysfatal("open: %r");
+	n = snprint(buf, sizeof buf, "resize -dx %d -dy %d", w, h);
+	if(write(fd, buf, n) != n)
+		fprint(2, "write error: %r\n");
+	close(fd);
+}
+
+void
 threadmain(int argc, char *argv[])
 {
 	lua_State *L;
+	Mouse m;
 	Rune k;
 	const char *s;
 	int r;
 	Alt alts[] = {
+		{ nil, &m, CHANRCV },
 		{ nil, nil, CHANRCV },
 		{ nil, &k,  CHANRCV },
 		{ nil, nil, CHANNOBLK },
@@ -56,8 +73,9 @@ threadmain(int argc, char *argv[])
 		sysfatal("initmouse: %r");
 	if((kc = initkeyboard(nil)) == nil)
 		sysfatal("initkeyboard: %r");
-	alts[0].c = mc->resizec;
-	alts[1].c = kc->c;
+	alts[0].c = mc->c;
+	alts[1].c = mc->resizec;
+	alts[2].c = kc->c;
 	L = luaL_newstate();
 	luaL_openlibs(L);
 	r = luaL_dofile(L, argc > 1 ? argv[1] : NULL);
@@ -67,15 +85,20 @@ threadmain(int argc, char *argv[])
 	}
 	registerfuncs(L);
 	initstate();
+	resize(width, height);
 	lsetup(L);
 	for(;;){
 		ldraw(L);
 		switch(alt(alts)){
 		case 0:
-			if(getwindow(display, Refnone)<0)
-				sysfatal("getwindow: %r");
 			break;
 		case 1:
+			if(getwindow(display, Refnone)<0)
+				sysfatal("getwindow: %r");
+			resize(width, height);
+			drawcanvas();
+			break;
+		case 2:
 			if(k == Kdel)
 				goto Done;
 			break;

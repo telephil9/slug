@@ -1,6 +1,8 @@
 #include "a.h"
 
 Image *canvas;
+int width;
+int height;
 int nostroke;
 Image *stroke;
 int strokewidth;
@@ -12,8 +14,10 @@ initstate(void)
 {
 	Rectangle r;
 
-	r = rectsubpt(screen->r, screen->r.min);
-	canvas = allocimage(display, r, screen->chan, 0, DNofill);
+	width = 500;
+	height = 500;
+	r = Rect(0, 0, width, height);
+	canvas = allocimage(display, r, screen->chan, 0, DWhite);
 	nostroke = 0;
 	stroke = display->black;
 	strokewidth = 1;
