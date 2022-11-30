@@ -8,6 +8,7 @@ Image *stroke;
 int strokewidth;
 int nofill;
 Image *fill;
+Point origin;
 
 void
 initstate(void)
@@ -23,6 +24,7 @@ initstate(void)
 	strokewidth = 1;
 	nofill = 0;
 	fill = display->white;
+	origin = ZP;
 }
 
 void
@@ -142,8 +144,8 @@ cline(lua_State *L)
 	y1 = luaL_checkinteger(L, 2);
 	x2 = luaL_checkinteger(L, 3);
 	y2 = luaL_checkinteger(L, 4);
-	p1 = Pt(x1, y1);
-	p2 = Pt(x2, y2);
+	p1 = addpt(origin, Pt(x1, y1));
+	p2 = addpt(origin, Pt(x2, y2));
 	if(!nostroke)
 		line(canvas, p1, p2, 0, 0, strokewidth, stroke, ZP);
 	return 0;
@@ -159,7 +161,7 @@ csquare(lua_State *L)
 	x = luaL_checkinteger(L, 1);
 	y = luaL_checkinteger(L, 2);
 	w = luaL_checkinteger(L, 3);
-	p1 = Pt(x, y);
+	p1 = addpt(origin, Pt(x, y));
 	p2 = addpt(p1, Pt(w, w));
 	r = Rpt(p1, p2);
 	if(!nofill)
@@ -180,7 +182,7 @@ crect(lua_State *L)
 	y = luaL_checkinteger(L, 2);
 	w = luaL_checkinteger(L, 3);
 	h = luaL_checkinteger(L, 4);
-	p1 = Pt(x, y);
+	p1 = addpt(origin, Pt(x, y));
 	p2 = addpt(p1, Pt(w, h));
 	r = Rpt(p1, p2);
 	if(!nofill)
@@ -199,7 +201,7 @@ ccircle(lua_State *L)
 	x = luaL_checkinteger(L, 1);
 	y = luaL_checkinteger(L, 2);
 	a = luaL_checkinteger(L, 3);
-	p = Pt(x, y);
+	p = addpt(origin, Pt(x, y));
 	if(!nofill)
 		fillellipse(canvas, p, a, a, fill, ZP);
 	if(!nostroke)
@@ -217,7 +219,7 @@ cellipse(lua_State *L)
 	y = luaL_checkinteger(L, 2);
 	a = luaL_checkinteger(L, 3);
 	b = luaL_checkinteger(L, 4);
-	p = Pt(x, y);
+	p = addpt(origin, Pt(x, y));
 	if(!nofill)
 		fillellipse(canvas, p, a, b, fill, ZP);
 	if(!nostroke)
@@ -237,7 +239,7 @@ carc(lua_State *L)
 	b = luaL_checkinteger(L, 4);
 	c = luaL_checkinteger(L, 5);
 	d = luaL_checkinteger(L, 6);
-	p = Pt(x, y);
+	p = addpt(origin, Pt(x, y));
 	if(!nofill)
 		fillarc(canvas, p, a, b, fill, ZP, c, d);
 	if(!nostroke)
@@ -257,14 +259,24 @@ ctriangle(lua_State *L)
 	y2 = luaL_checkinteger(L, 4);
 	x3 = luaL_checkinteger(L, 5);
 	y3 = luaL_checkinteger(L, 6);
-	p[0] = Pt(x1, y1);
-	p[1] = Pt(x2, y2);
-	p[2] = Pt(x3, y3);
+	p[0] = addpt(origin, Pt(x1, y1));
+	p[1] = addpt(origin, Pt(x2, y2));
+	p[2] = addpt(origin, Pt(x3, y3));
 	p[3] = p[0];
 	if(!nofill)
 		fillpoly(canvas, p, 3, 0, fill, ZP);
 	if(!nostroke)
 		poly(canvas, p, 4, 0, 0, strokewidth, stroke, ZP);
+	return 0;
+}
+
+int ctranspose(lua_State *L)
+{
+	int x, y;
+
+	x = luaL_checkinteger(L, 1);
+	y = luaL_checkinteger(L, 2);
+	origin = Pt(x, y);
 	return 0;
 }
 
@@ -292,5 +304,6 @@ registerfuncs(lua_State *L)
 	registerfunc(L, "ellipse", cellipse);
 	registerfunc(L, "arc", carc);
 	registerfunc(L, "triangle", ctriangle);
+	registerfunc(L, "transpose", ctranspose);
 }
 
