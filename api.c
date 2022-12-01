@@ -6,6 +6,7 @@ enum
 	Chsv,
 };
 
+int		framerate;
 Image	*canvas;
 int		width;
 int		height;
@@ -23,6 +24,7 @@ initstate(lua_State *L)
 {
 	Rectangle r;
 
+	framerate = 90;
 	width = 500;
 	height = 500;
 	r = Rect(0, 0, width, height);
@@ -44,6 +46,18 @@ drawcanvas(void)
 {
 	draw(screen, screen->r, canvas, nil, ZP);
 	flushimage(display, 1);
+}
+
+int
+cframerate(lua_State *L)
+{
+	int n;
+
+	n = luaL_checkinteger(L, 1);
+	if(n < 0)
+		return LUA_ERRRUN;
+	framerate = n;
+	return LUA_OK;
 }
 
 int
@@ -380,6 +394,7 @@ registerapi(lua_State *L)
 	lset(L, "SQUARE", Endsquare);
 	lset(L, "ROUND", Enddisc);
 
+	registerfunc(L, "frameRate", cframerate);
 	registerfunc(L, "size", csize);
 	registerfunc(L, "colorMode", ccolormode);
 	registerfunc(L, "background", cbackground);

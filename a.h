@@ -18,6 +18,7 @@ void	registerapi(lua_State*);
 Image*	color(int, int, int, int);
 
 extern int		drawing;
+extern int		framerate;
 extern Image	*canvas;
 extern int		width;
 extern int		height;

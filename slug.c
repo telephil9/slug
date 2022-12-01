@@ -97,6 +97,8 @@ void
 threadmain(int argc, char *argv[])
 {
 	lua_State *L;
+	vlong t0, t1;
+	double delta;
 	Mouse m;
 	Rune k;
 	Alt alts[] = {
@@ -124,7 +126,12 @@ threadmain(int argc, char *argv[])
 	lcall(L, "setup");
 	drawing = 1;
 	for(;;){
+		t0 = nsec();
 		lcall(L, "draw");
+		t1 = nsec();
+		delta = (t1 - t0) / 1000000.0;
+		if(delta > 0.0)
+			sleep((1000.0 / framerate) - delta);
 		switch(alt(alts)){
 		case 0:
 			emouse(L, m);
