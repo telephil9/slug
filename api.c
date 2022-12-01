@@ -63,17 +63,18 @@ getcolor(lua_State *L)
 
 	c = lua_gettop(L);
 	if(c == 1){
-		g = luaL_checkinteger(L, 1);
-		i = grayscale(g);
+		r = luaL_checkinteger(L, 1);
+		g = r;
+		b = r;
 	}else if(c == 3){
 		r = luaL_checkinteger(L, 1);
 		g = luaL_checkinteger(L, 2);
 		b = luaL_checkinteger(L, 3);
-		i = color(r, g, b);
 	}else{
 		fprint(2, "invalid color request\n");
 		return nil;
 	}
+	i = color(r, g, b);
 	return i;
 }
 

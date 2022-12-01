@@ -16,7 +16,6 @@ void	initstate(lua_State*);
 void	registerapi(lua_State*);
 
 Image*	color(int, int, int);
-Image*	grayscale(int);
 
 extern int		drawing;
 extern Image	*canvas;

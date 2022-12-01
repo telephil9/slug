@@ -48,9 +48,3 @@ color(int r, int g, int b)
 	return c;
 }
 
-Image*
-grayscale(int n)
-{
-	return color(n, n, n);
-}
-
