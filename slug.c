@@ -117,7 +117,7 @@ threadmain(int argc, char *argv[])
 	alts[1].c = mc->resizec;
 	alts[2].c = kc->c;
 	L = linit(argc, argv);
-	registerfuncs(L);
+	registerapi(L);
 	initstate(L);
 	resize(L, width, height);
 	drawing = 0;

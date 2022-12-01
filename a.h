@@ -13,13 +13,14 @@ void	resize(lua_State*, int, int);
 
 void	drawcanvas(void);
 void	initstate(lua_State*);
-void	registerfuncs(lua_State*);
+void	registerapi(lua_State*);
 
 Image*	color(int, int, int);
 Image*	grayscale(int);
 
-extern int drawing;
-extern Image* canvas;
-extern int width;
-extern int height;
-extern Point origin;
+extern int		drawing;
+extern Image	*canvas;
+extern int		width;
+extern int		height;
+extern Point	origin;
+

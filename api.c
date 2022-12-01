@@ -1,14 +1,15 @@
 #include "a.h"
 
-Image *canvas;
-int width;
-int height;
-int nostroke;
-Image *stroke;
-int strokewidth;
-int nofill;
-Image *fill;
-Point origin;
+Image	*canvas;
+int		width;
+int		height;
+int		nostroke;
+int		strokecap;
+Image	*stroke;
+int		strokewidth;
+int		nofill;
+Image	*fill;
+Point	origin;
 
 void
 initstate(lua_State *L)
@@ -20,6 +21,7 @@ initstate(lua_State *L)
 	r = Rect(0, 0, width, height);
 	canvas = allocimage(display, r, screen->chan, 0, DWhite);
 	nostroke = 0;
+	strokecap = Endsquare;
 	stroke = display->black;
 	strokewidth = 1;
 	nofill = 0;
@@ -95,6 +97,17 @@ cnostroke(lua_State*)
 }
 
 int
+cstrokecap(lua_State *L)
+{
+	int n;
+
+	n = luaL_checkinteger(L, 1);
+	if(n == Endsquare || n == Enddisc)
+		strokecap = n;
+	return 0;
+}
+
+int
 cstroke(lua_State *L)
 {
 	Image *i;
@@ -166,7 +179,7 @@ cline(lua_State *L)
 	p1 = addpt(origin, Pt(x1, y1));
 	p2 = addpt(origin, Pt(x2, y2));
 	if(!nostroke)
-		line(canvas, p1, p2, 0, 0, strokewidth, stroke, ZP);
+		line(canvas, p1, p2, strokecap, strokecap, strokewidth, stroke, ZP);
 	return 0;
 }
 
@@ -285,7 +298,7 @@ ctriangle(lua_State *L)
 	if(!nofill)
 		fillpoly(canvas, p, 3, 0, fill, ZP);
 	if(!nostroke)
-		poly(canvas, p, 4, 0, 0, strokewidth, stroke, ZP);
+		poly(canvas, p, 4, strokecap, strokecap, strokewidth, stroke, ZP);
 	return 0;
 }
 
@@ -311,7 +324,7 @@ cquad(lua_State *L)
 	if(!nofill)
 		fillpoly(canvas, p, 4, 0, fill, ZP);
 	if(!nostroke)
-		poly(canvas, p, 5, 0, 0, strokewidth, stroke, ZP);
+		poly(canvas, p, 5, strokecap, strokecap, strokewidth, stroke, ZP);
 	return 0;
 
 }
@@ -335,11 +348,15 @@ registerfunc(lua_State *L, const char *name, int(*f)(lua_State*))
 }
 
 void
-registerfuncs(lua_State *L)
+registerapi(lua_State *L)
 {
+	lset(L, "SQUARE", Endsquare);
+	lset(L, "ROUND", Enddisc);
+
 	registerfunc(L, "size", csize);
 	registerfunc(L, "background", cbackground);
 	registerfunc(L, "noStroke", cnostroke);
+	registerfunc(L, "strokeCap", cstrokecap);
 	registerfunc(L, "stroke", cstroke);
 	registerfunc(L, "strokeWidth", cstrokewidth);
 	registerfunc(L, "noFill", cnofill);
