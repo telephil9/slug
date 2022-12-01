@@ -6,6 +6,7 @@ enum
 	Chsv,
 };
 
+int		looping;
 int		framerate;
 Image	*canvas;
 int		width;
@@ -24,6 +25,7 @@ initstate(lua_State *L)
 {
 	Rectangle r;
 
+	looping = 1;
 	framerate = 90;
 	width = 500;
 	height = 500;
@@ -46,6 +48,20 @@ drawcanvas(void)
 {
 	draw(screen, screen->r, canvas, nil, ZP);
 	flushimage(display, 1);
+}
+
+int
+cnoloop(lua_State*)
+{
+	looping = 0;
+	return LUA_OK;
+}
+
+int
+cloop(lua_State*)
+{
+	looping = 1;
+	return LUA_OK;
 }
 
 int
@@ -394,6 +410,8 @@ registerapi(lua_State *L)
 	lset(L, "SQUARE", Endsquare);
 	lset(L, "ROUND", Enddisc);
 
+	registerfunc(L, "noLoop", cnoloop);
+	registerfunc(L, "loop", cloop);
 	registerfunc(L, "frameRate", cframerate);
 	registerfunc(L, "size", csize);
 	registerfunc(L, "colorMode", ccolormode);
