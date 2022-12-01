@@ -8,10 +8,11 @@
 #include <lauxlib.h>
 #include <lualib.h>
 
+void	lset(lua_State*, const char*, int);
 void	resize(lua_State*, int, int);
 
 void	drawcanvas(void);
-void	initstate(void);
+void	initstate(lua_State*);
 void	registerfuncs(lua_State*);
 
 Image*	color(int, int, int);
@@ -21,3 +22,4 @@ extern int drawing;
 extern Image* canvas;
 extern int width;
 extern int height;
+extern Point origin;

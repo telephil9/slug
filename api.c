@@ -11,7 +11,7 @@ Image *fill;
 Point origin;
 
 void
-initstate(void)
+initstate(lua_State *L)
 {
 	Rectangle r;
 
@@ -25,6 +25,8 @@ initstate(void)
 	nofill = 0;
 	fill = display->white;
 	origin = ZP;
+	lset(L, "mouseX", 0);
+	lset(L, "mouseY", 0);
 }
 
 void

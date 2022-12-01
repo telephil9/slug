@@ -83,6 +83,17 @@ resize(lua_State *L, int w, int h)
 }
 
 void
+emouse(lua_State *L, Mouse m)
+{
+	Point xy;
+
+	xy = subpt(m.xy, screen->r.min);
+	xy = subpt(xy, origin);
+	lset(L, "mouseX", xy.x);
+	lset(L, "mouseY", xy.y);
+}
+
+void
 threadmain(int argc, char *argv[])
 {
 	lua_State *L;
@@ -107,7 +118,7 @@ threadmain(int argc, char *argv[])
 	alts[2].c = kc->c;
 	L = linit(argc, argv);
 	registerfuncs(L);
-	initstate();
+	initstate(L);
 	resize(L, width, height);
 	drawing = 0;
 	lcall(L, "setup");
@@ -116,6 +127,7 @@ threadmain(int argc, char *argv[])
 		lcall(L, "draw");
 		switch(alt(alts)){
 		case 0:
+			emouse(L, m);
 			break;
 		case 1:
 			if(getwindow(display, Refnone)<0)
