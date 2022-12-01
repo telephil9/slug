@@ -162,7 +162,10 @@ cpoint(lua_State *L)
 	p1 = addpt(origin, Pt(x, y));
 	p2 = addpt(p1, Pt(strokewidth, strokewidth));
 	if(!nostroke)
-		draw(canvas, Rpt(p1, p2), stroke, nil, ZP);
+		if(strokecap == Endsquare)
+			draw(canvas, Rpt(p1, p2), stroke, nil, ZP);
+		else if(strokecap == Enddisc)
+			fillellipse(canvas, p1, strokewidth/2.0, strokewidth/2.0, stroke, ZP);
 	return 0;
 }
 
