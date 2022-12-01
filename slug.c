@@ -4,23 +4,57 @@ Mousectl *mc;
 Keyboardctl *kc;
 int drawing;
 
-void
-lsetup(lua_State *L)
+lua_State*
+linit(int argc, char *argv[])
 {
-	lua_getglobal(L, "setup");
-	if(!lua_isfunction(L, -1))
-		return;
-	lua_call(L, 0, 0);
-	drawcanvas();
+	lua_State *L;
+	const char *s;
+	int r;
+
+	L = luaL_newstate();
+	luaL_openlibs(L);
+	r = luaL_dofile(L, argc > 1 ? argv[1] : NULL);
+	if(r != LUA_OK){
+		s = luaL_checkstring(L, lua_gettop(L));
+		fprint(2, "error: %s\n", s);
+	}
+	return L;
 }
 
-void
-ldraw(lua_State *L)
+int
+lcallerror(lua_State *L)
 {
-	lua_getglobal(L, "draw");
+	const char *m;
+
+	m = lua_tostring(L, 1);
+	if(m == nil){
+		if(luaL_callmeta(L, 1, "__tostring") && lua_type(L, -1) == LUA_TSTRING)
+			return 1;
+		else
+			m = lua_pushfstring(L, "(error object is a %s value)", luaL_typename(L, 1));
+	}
+	luaL_traceback(L, L, m, 1);
+	return 1;
+}	
+
+void
+lcall(lua_State *L, char *fn)
+{
+	int r, base;
+
+	lua_getglobal(L, fn);
 	if(!lua_isfunction(L, -1))
 		return;
-	lua_call(L, 0, 0);
+	base = lua_gettop(L);
+	lua_pushcfunction(L, lcallerror);
+	lua_insert(L, base);
+	r = lua_pcall(L, 0, 0, base);
+	lua_remove(L, base);
+	if(r != LUA_OK){
+		fprint(2, "error: %s\n", lua_tostring(L, -1));
+		lua_pop(L, 1);
+		return;
+	}
 	drawcanvas();
 }
 
@@ -49,8 +83,6 @@ threadmain(int argc, char *argv[])
 	lua_State *L;
 	Mouse m;
 	Rune k;
-	const char *s;
-	int r;
 	Alt alts[] = {
 		{ nil, &m, CHANRCV },
 		{ nil, nil, CHANRCV },
@@ -68,21 +100,15 @@ threadmain(int argc, char *argv[])
 	alts[0].c = mc->c;
 	alts[1].c = mc->resizec;
 	alts[2].c = kc->c;
-	L = luaL_newstate();
-	luaL_openlibs(L);
-	r = luaL_dofile(L, argc > 1 ? argv[1] : NULL);
-	if(r != LUA_OK){
-		s = luaL_checkstring(L, lua_gettop(L));
-		fprint(2, "error: %s\n", s);
-	}
+	L = linit(argc, argv);
 	registerfuncs(L);
 	initstate();
 	resize(L, width, height);
 	drawing = 0;
-	lsetup(L);
+	lcall(L, "setup");
 	drawing = 1;
 	for(;;){
-		ldraw(L);
+		lcall(L, "draw");
 		switch(alt(alts)){
 		case 0:
 			break;
@@ -100,6 +126,6 @@ threadmain(int argc, char *argv[])
 	}
 Done:
 	lua_close(L);
-	threadexitsall(r == LUA_OK ? nil : "error");
+	threadexitsall(nil);
 }
 
