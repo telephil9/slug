@@ -59,6 +59,13 @@ lcall(lua_State *L, char *fn)
 }
 
 void
+lset(lua_State *L, const char *name, int value)
+{
+	lua_pushnumber(L, value);
+	lua_setglobal(L, name);
+}
+
+void
 resize(lua_State *L, int w, int h)
 {
 	int fd, n;
@@ -71,10 +78,8 @@ resize(lua_State *L, int w, int h)
 	if(write(fd, buf, n) != n)
 		fprint(2, "write error: %r\n");
 	close(fd);
-	lua_pushnumber(L, w);
-	lua_setglobal(L, "width");
-	lua_pushnumber(L, h);
-	lua_setglobal(L, "height");
+	lset(L, "width", w);
+	lset(L, "height", h);
 }
 
 void
