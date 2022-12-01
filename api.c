@@ -1,8 +1,15 @@
 #include "a.h"
 
+enum
+{
+	Crgb,
+	Chsv,
+};
+
 Image	*canvas;
 int		width;
 int		height;
+int		colormode;
 int		nostroke;
 int		strokecap;
 Image	*stroke;
@@ -20,6 +27,7 @@ initstate(lua_State *L)
 	height = 500;
 	r = Rect(0, 0, width, height);
 	canvas = allocimage(display, r, screen->chan, 0, DWhite);
+	colormode = Crgb;
 	nostroke = 0;
 	strokecap = Endsquare;
 	stroke = display->black;
@@ -63,19 +71,32 @@ getcolor(lua_State *L)
 
 	c = lua_gettop(L);
 	if(c == 1){
-		r = luaL_checkinteger(L, 1);
-		g = r;
-		b = r;
+		g = luaL_checkinteger(L, 1);
+		i = color(g, g, g, 0);
 	}else if(c == 3){
 		r = luaL_checkinteger(L, 1);
 		g = luaL_checkinteger(L, 2);
 		b = luaL_checkinteger(L, 3);
+		i = color(r, g, b, colormode == Chsv);
 	}else{
 		fprint(2, "invalid color request\n");
 		return nil;
 	}
-	i = color(r, g, b);
 	return i;
+}
+
+int
+ccolormode(lua_State *L)
+{
+	int n;
+
+	n = luaL_checkinteger(L, 1);
+	if(n != Crgb && n != Chsv){
+		fprint(2, "error: invalid color mode\n");
+		return LUA_ERRRUN;
+	}
+	colormode = n;
+	return LUA_OK;
 }
 
 int
@@ -354,10 +375,13 @@ registerfunc(lua_State *L, const char *name, int(*f)(lua_State*))
 void
 registerapi(lua_State *L)
 {
+	lset(L, "RGB", Crgb);
+	lset(L, "HSV", Chsv);
 	lset(L, "SQUARE", Endsquare);
 	lset(L, "ROUND", Enddisc);
 
 	registerfunc(L, "size", csize);
+	registerfunc(L, "colorMode", ccolormode);
 	registerfunc(L, "background", cbackground);
 	registerfunc(L, "noStroke", cnostroke);
 	registerfunc(L, "strokeCap", cstrokecap);
