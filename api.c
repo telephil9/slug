@@ -45,6 +45,8 @@ csize(lua_State *L)
 		return 0;
 	width = w;
 	height = h;
+	freeimage(canvas);
+	canvas = allocimage(display, Rect(0, 0, w, h), screen->chan, 0, DNofill);
 	resize(L, w, h);
 	return 0;
 }
