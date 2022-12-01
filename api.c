@@ -287,7 +287,35 @@ ctriangle(lua_State *L)
 	return 0;
 }
 
-int ctranspose(lua_State *L)
+int
+cquad(lua_State *L)
+{
+	Point p[5];
+	int x1, y1, x2, y2, x3, y3, x4, y4;
+
+	x1 = luaL_checkinteger(L, 1);
+	y1 = luaL_checkinteger(L, 2);
+	x2 = luaL_checkinteger(L, 3);
+	y2 = luaL_checkinteger(L, 4);
+	x3 = luaL_checkinteger(L, 5);
+	y3 = luaL_checkinteger(L, 6);
+	x4 = luaL_checkinteger(L, 7);
+	y4 = luaL_checkinteger(L, 8);
+	p[0] = addpt(origin, Pt(x1, y1));
+	p[1] = addpt(origin, Pt(x2, y2));
+	p[2] = addpt(origin, Pt(x3, y3));
+	p[3] = addpt(origin, Pt(x4, y4));
+	p[4] = p[0];
+	if(!nofill)
+		fillpoly(canvas, p, 4, 0, fill, ZP);
+	if(!nostroke)
+		poly(canvas, p, 5, 0, 0, strokewidth, stroke, ZP);
+	return 0;
+
+}
+
+int
+ctranspose(lua_State *L)
 {
 	int x, y;
 
@@ -322,6 +350,7 @@ registerfuncs(lua_State *L)
 	registerfunc(L, "ellipse", cellipse);
 	registerfunc(L, "arc", carc);
 	registerfunc(L, "triangle", ctriangle);
+	registerfunc(L, "quad", cquad);
 	registerfunc(L, "transpose", ctranspose);
 }
 
