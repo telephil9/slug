@@ -1,5 +1,13 @@
 #include "a.h"
 
+typedef struct Tmatrix Tmatrix;
+
+struct Tmatrix
+{
+	Point origin;
+	double angle;
+};
+
 enum
 {
 	Crgb,
@@ -21,11 +29,16 @@ Image	*fill;
 Point	origin;
 double	angle;
 
+
+Tmatrix tstack[255] = {0};
+int ntstack;
+
 void
 initstate(lua_State *L)
 {
 	Rectangle r;
 
+	ntstack = 0;
 	looping = 1;
 	framerate = 90;
 	width = 500;
@@ -429,6 +442,28 @@ cradians(lua_State *L)
 	return 1;
 }
 
+int
+cpushmatrix(lua_State *L)
+{
+	if(ntstack == nelem(tstack) - 1)
+		return luaL_error(L, "stack overflow");
+	tstack[ntstack].origin = origin;
+	tstack[ntstack].angle  = angle;
+	ntstack++;
+	return 0;
+}
+
+int
+cpopmatrix(lua_State *L)
+{
+	if(ntstack == 0)
+		return luaL_error(L, "stack underflow");
+	ntstack--;
+	origin = tstack[ntstack].origin;
+	angle  = tstack[ntstack].angle;
+	return 0;
+}
+
 void
 registerfunc(lua_State *L, const char *name, int(*f)(lua_State*))
 {
@@ -468,5 +503,7 @@ registerapi(lua_State *L)
 	registerfunc(L, "transpose", ctranspose);
 	registerfunc(L, "rotate", crotate);
 	registerfunc(L, "radians", cradians);
+	registerfunc(L, "pushMatrix", cpushmatrix);
+	registerfunc(L, "popMatrix", cpopmatrix);
 }
 
