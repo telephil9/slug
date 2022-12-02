@@ -415,7 +415,7 @@ cquad(lua_State *L)
 }
 
 int
-ctranspose(lua_State *L)
+ctranslate(lua_State *L)
 {
 	int x, y;
 
@@ -500,7 +500,7 @@ registerapi(lua_State *L)
 	registerfunc(L, "arc", carc);
 	registerfunc(L, "triangle", ctriangle);
 	registerfunc(L, "quad", cquad);
-	registerfunc(L, "transpose", ctranspose);
+	registerfunc(L, "translate", ctranslate);
 	registerfunc(L, "rotate", crotate);
 	registerfunc(L, "radians", cradians);
 	registerfunc(L, "pushMatrix", cpushmatrix);
