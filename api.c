@@ -408,14 +408,14 @@ ctranspose(lua_State *L)
 
 	x = luaL_checkinteger(L, 1);
 	y = luaL_checkinteger(L, 2);
-	origin = Pt(x, y);
+	origin = addpt(origin, Pt(x, y));
 	return 0;
 }
 
 int
 crotate(lua_State *L)
 {
-	angle = luaL_checknumber(L, 1);
+	angle += luaL_checknumber(L, 1);
 	return 0;
 }
 
