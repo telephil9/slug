@@ -507,6 +507,22 @@ cpopstyle(lua_State *L)
 	return 0;
 }
 
+int
+cpush(lua_State *L)
+{
+	cpushmatrix(L);
+	cpushstyle(L);
+	return 0;
+}
+
+int
+cpop(lua_State *L)
+{
+	cpopmatrix(L);
+	cpopstyle(L);
+	return 0;
+}
+
 void
 registerfunc(lua_State *L, const char *name, int(*f)(lua_State*))
 {
@@ -550,5 +566,7 @@ registerapi(lua_State *L)
 	registerfunc(L, "popMatrix", cpopmatrix);
 	registerfunc(L, "pushStyle", cpushstyle);
 	registerfunc(L, "popStyle", cpopstyle);
+	registerfunc(L, "push", cpush);
+	registerfunc(L, "pop", cpop);
 }
 
