@@ -62,7 +62,7 @@ initstate(lua_State *L)
 	nostroke = 0;
 	strokecap = Endsquare;
 	stroke = display->black;
-	strokeweight = 1;
+	strokeweight = 0;
 	nofill = 0;
 	fill = display->white;
 	origin = ZP;
@@ -240,7 +240,7 @@ cstrokeweight(lua_State *L)
 	int n;
 
 	n = luaL_checkinteger(L, 1);
-	strokeweight = n;
+	strokeweight = n/2;
 	return 0;
 }
 
@@ -330,7 +330,7 @@ ccircle(lua_State *L)
 
 	x = luaL_checkinteger(L, 1);
 	y = luaL_checkinteger(L, 2);
-	a = luaL_checkinteger(L, 3);
+	a = luaL_checkinteger(L, 3) / 2;
 	p = canvaspt(x, y);
 	if(!nofill)
 		fillellipse(canvas, p, a, a, fill, ZP);
@@ -347,8 +347,8 @@ cellipse(lua_State *L)
 
 	x = luaL_checkinteger(L, 1);
 	y = luaL_checkinteger(L, 2);
-	a = luaL_checkinteger(L, 3);
-	b = luaL_checkinteger(L, 4);
+	a = luaL_checkinteger(L, 3) / 2;
+	b = luaL_checkinteger(L, 4) / 2;
 	p = canvaspt(x, y);
 	if(!nofill)
 		fillellipse(canvas, p, a, b, fill, ZP);
