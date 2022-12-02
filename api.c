@@ -19,6 +19,7 @@ int		strokewidth;
 int		nofill;
 Image	*fill;
 Point	origin;
+double	angle;
 
 void
 initstate(lua_State *L)
@@ -39,6 +40,7 @@ initstate(lua_State *L)
 	nofill = 0;
 	fill = display->white;
 	origin = ZP;
+	angle = 0.0;
 	lset(L, "mouseX", 0);
 	lset(L, "mouseY", 0);
 }
@@ -48,6 +50,20 @@ drawcanvas(void)
 {
 	draw(screen, screen->r, canvas, nil, ZP);
 	flushimage(display, 1);
+}
+
+Point
+canvaspt(int x, int y)
+{
+	Point p;
+
+	p = Pt(x, y);
+	if(fabs(angle) > 0.000001){
+		p.x = x * cos(angle) - y * sin(angle);
+		p.y = x * sin(angle) + y * cos(angle);
+	}
+	p = addpt(p, origin);
+	return p;
 }
 
 int
@@ -203,8 +219,8 @@ cpoint(lua_State *L)
 
 	x = luaL_checkinteger(L, 1);
 	y = luaL_checkinteger(L, 2);
-	p1 = addpt(origin, Pt(x, y));
-	p2 = addpt(p1, Pt(strokewidth, strokewidth));
+	p1 = canvaspt(x, y);
+	p2 = canvaspt(x + strokewidth, y + strokewidth);
 	if(!nostroke)
 		if(strokecap == Endsquare)
 			draw(canvas, Rpt(p1, p2), stroke, nil, ZP);
@@ -223,8 +239,8 @@ cline(lua_State *L)
 	y1 = luaL_checkinteger(L, 2);
 	x2 = luaL_checkinteger(L, 3);
 	y2 = luaL_checkinteger(L, 4);
-	p1 = addpt(origin, Pt(x1, y1));
-	p2 = addpt(origin, Pt(x2, y2));
+	p1 = canvaspt(x1, y1);
+	p2 = canvaspt(x2, y2);
 	if(!nostroke)
 		line(canvas, p1, p2, strokecap, strokecap, strokewidth, stroke, ZP);
 	return 0;
@@ -233,41 +249,43 @@ cline(lua_State *L)
 int
 csquare(lua_State *L)
 {
-	Rectangle r;
-	Point p1, p2;
+	Point p[5];
 	int x, y, w;
 
 	x = luaL_checkinteger(L, 1);
 	y = luaL_checkinteger(L, 2);
 	w = luaL_checkinteger(L, 3);
-	p1 = addpt(origin, Pt(x, y));
-	p2 = addpt(p1, Pt(w, w));
-	r = Rpt(p1, p2);
+	p[0] = canvaspt(x, y);
+	p[1] = canvaspt(x + w, y);
+	p[2] = canvaspt(x + w, y + w);
+	p[3] = canvaspt(x, y+w);
+	p[4] = p[0];
 	if(!nofill)
-		draw(canvas, r, fill, nil, ZP);
+		fillpoly(canvas, p, 4, 0, fill, ZP);
 	if(!nostroke)
-		border(canvas, r, strokewidth, stroke, ZP);
+		poly(canvas, p, 5, strokecap, strokecap, strokewidth, stroke, ZP);
 	return 0;
 }
 
 int
 crect(lua_State *L)
 {
-	Rectangle r;
-	Point p1, p2;
+	Point p[5];
 	int x, y, w, h;
 
 	x = luaL_checkinteger(L, 1);
 	y = luaL_checkinteger(L, 2);
 	w = luaL_checkinteger(L, 3);
 	h = luaL_checkinteger(L, 4);
-	p1 = addpt(origin, Pt(x, y));
-	p2 = addpt(p1, Pt(w, h));
-	r = Rpt(p1, p2);
+	p[0] = canvaspt(x, y);
+	p[1] = canvaspt(x + w, y);
+	p[2] = canvaspt(x + w, y + h);
+	p[3] = canvaspt(x, y + h);
+	p[4] = p[0];
 	if(!nofill)
-		draw(canvas, r, fill, nil, ZP);
+		fillpoly(canvas, p, 4, 0, fill, ZP);
 	if(!nostroke)
-		border(canvas, r, strokewidth, stroke, ZP);
+		poly(canvas, p, 5, strokecap, strokecap, strokewidth, stroke, ZP);
 	return 0;
 }
 
@@ -280,7 +298,7 @@ ccircle(lua_State *L)
 	x = luaL_checkinteger(L, 1);
 	y = luaL_checkinteger(L, 2);
 	a = luaL_checkinteger(L, 3);
-	p = addpt(origin, Pt(x, y));
+	p = canvaspt(x, y);
 	if(!nofill)
 		fillellipse(canvas, p, a, a, fill, ZP);
 	if(!nostroke)
@@ -298,7 +316,7 @@ cellipse(lua_State *L)
 	y = luaL_checkinteger(L, 2);
 	a = luaL_checkinteger(L, 3);
 	b = luaL_checkinteger(L, 4);
-	p = addpt(origin, Pt(x, y));
+	p = canvaspt(x, y);
 	if(!nofill)
 		fillellipse(canvas, p, a, b, fill, ZP);
 	if(!nostroke)
@@ -318,7 +336,7 @@ carc(lua_State *L)
 	b = luaL_checkinteger(L, 4);
 	c = luaL_checkinteger(L, 5);
 	d = luaL_checkinteger(L, 6);
-	p = addpt(origin, Pt(x, y));
+	p = canvaspt(x, y);
 	if(!nofill)
 		fillarc(canvas, p, a, b, fill, ZP, c, d);
 	if(!nostroke)
@@ -338,9 +356,9 @@ ctriangle(lua_State *L)
 	y2 = luaL_checkinteger(L, 4);
 	x3 = luaL_checkinteger(L, 5);
 	y3 = luaL_checkinteger(L, 6);
-	p[0] = addpt(origin, Pt(x1, y1));
-	p[1] = addpt(origin, Pt(x2, y2));
-	p[2] = addpt(origin, Pt(x3, y3));
+	p[0] = canvaspt(x1, y1);
+	p[1] = canvaspt(x2, y2);
+	p[2] = canvaspt(x3, y3);
 	p[3] = p[0];
 	if(!nofill)
 		fillpoly(canvas, p, 3, 0, fill, ZP);
@@ -363,10 +381,10 @@ cquad(lua_State *L)
 	y3 = luaL_checkinteger(L, 6);
 	x4 = luaL_checkinteger(L, 7);
 	y4 = luaL_checkinteger(L, 8);
-	p[0] = addpt(origin, Pt(x1, y1));
-	p[1] = addpt(origin, Pt(x2, y2));
-	p[2] = addpt(origin, Pt(x3, y3));
-	p[3] = addpt(origin, Pt(x4, y4));
+	p[0] = canvaspt(x1, y1);
+	p[1] = canvaspt(x2, y2);
+	p[2] = canvaspt(x3, y3);
+	p[3] = canvaspt(x4, y4);
 	p[4] = p[0];
 	if(!nofill)
 		fillpoly(canvas, p, 4, 0, fill, ZP);
@@ -384,6 +402,13 @@ ctranspose(lua_State *L)
 	x = luaL_checkinteger(L, 1);
 	y = luaL_checkinteger(L, 2);
 	origin = Pt(x, y);
+	return 0;
+}
+
+int
+crotate(lua_State *L)
+{
+	angle = luaL_checknumber(L, 1);
 	return 0;
 }
 
@@ -424,5 +449,6 @@ registerapi(lua_State *L)
 	registerfunc(L, "triangle", ctriangle);
 	registerfunc(L, "quad", cquad);
 	registerfunc(L, "transpose", ctranspose);
+	registerfunc(L, "rotate", crotate);
 }
 
