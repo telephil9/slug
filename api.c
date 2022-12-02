@@ -54,14 +54,14 @@ int
 cnoloop(lua_State*)
 {
 	looping = 0;
-	return LUA_OK;
+	return 0;
 }
 
 int
 cloop(lua_State*)
 {
 	looping = 1;
-	return LUA_OK;
+	return 0;
 }
 
 int
@@ -71,9 +71,9 @@ cframerate(lua_State *L)
 
 	n = luaL_checkinteger(L, 1);
 	if(n < 0)
-		return LUA_ERRRUN;
+		return luaL_argerror(L, 1, "framerate should be greater than 0");
 	framerate = n;
-	return LUA_OK;
+	return 0;
 }
 
 int
@@ -109,7 +109,7 @@ getcolor(lua_State *L)
 		b = luaL_checkinteger(L, 3);
 		i = color(r, g, b, colormode == Chsv);
 	}else{
-		fprint(2, "invalid color request\n");
+		luaL_error(L, "invalid argument count (expected 1 or 3 but received %d)", c);
 		return nil;
 	}
 	return i;
@@ -121,12 +121,10 @@ ccolormode(lua_State *L)
 	int n;
 
 	n = luaL_checkinteger(L, 1);
-	if(n != Crgb && n != Chsv){
-		fprint(2, "error: invalid color mode\n");
-		return LUA_ERRRUN;
-	}
+	if(n != Crgb && n != Chsv)
+		return luaL_argerror(L, 1, "expected RGB or HSV");
 	colormode = n;
-	return LUA_OK;
+	return 0;
 }
 
 int
@@ -135,8 +133,6 @@ cbackground(lua_State *L)
 	Image *i;
 
 	i = getcolor(L);
-	if(i == nil)
-		return 1;
 	draw(canvas, canvas->r, i, nil, ZP);
 	return 0;
 }
@@ -165,8 +161,6 @@ cstroke(lua_State *L)
 	Image *i;
 
 	i = getcolor(L);
-	if(i == nil)
-		return 1;
 	stroke = i;
 	nostroke = 0;
 	return 0;
@@ -185,8 +179,6 @@ cfill(lua_State *L)
 	Image *i;
 
 	i = getcolor(L);
-	if(i == nil)
-		return 1;
 	fill = i;
 	nofill = 0;
 	return 0;

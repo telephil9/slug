@@ -51,9 +51,9 @@ lcall(lua_State *L, char *fn)
 	r = lua_pcall(L, 0, 0, base);
 	lua_remove(L, base);
 	if(r != LUA_OK){
-		fprint(2, "error: %s\n", lua_tostring(L, -1));
+		fprint(2, "%s\n", lua_tostring(L, -1));
 		lua_pop(L, 1);
-		return;
+		threadexitsall("error");
 	}
 	drawcanvas();
 }
