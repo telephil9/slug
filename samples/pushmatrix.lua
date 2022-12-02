@@ -11,7 +11,7 @@ function draw()
 	rect(0, 0, 200, 200)
 
 	pushMatrix()
-	transpose(120, 80)
+	translate(120, 80)
 	fill(0)  
 	rect(0, 0, 200, 200)
 	popMatrix()
