@@ -1,11 +1,22 @@
 #include "a.h"
 
 typedef struct Tmatrix Tmatrix;
+typedef struct Style Style;
 
 struct Tmatrix
 {
 	Point origin;
 	double angle;
+};
+
+struct Style
+{
+	int		nostroke;
+	int		strokecap;
+	Image	*stroke;
+	int		strokewidth;
+	int		nofill;
+	Image	*fill;
 };
 
 enum
@@ -32,6 +43,8 @@ double	angle;
 
 Tmatrix tstack[255] = {0};
 int ntstack;
+Style sstack[255] = {0};
+int nsstack;
 
 void
 initstate(lua_State *L)
@@ -464,6 +477,36 @@ cpopmatrix(lua_State *L)
 	return 0;
 }
 
+int
+cpushstyle(lua_State *L)
+{
+	if(nsstack == nelem(sstack) - 1)
+		return luaL_error(L, "stack overflow");
+	sstack[nsstack].nostroke = nostroke;
+	sstack[nsstack].strokecap = strokecap;
+	sstack[nsstack].stroke = stroke;
+	sstack[nsstack].strokewidth = strokewidth;
+	sstack[nsstack].nofill = nofill;
+	sstack[nsstack].fill = fill;
+	nsstack++;
+	return 0;
+}
+
+int
+cpopstyle(lua_State *L)
+{
+	if(nsstack == 0)
+		return luaL_error(L, "stack underflow");
+	nsstack--;
+	nostroke = sstack[nsstack].nostroke;
+	strokecap = sstack[nsstack].strokecap;
+	stroke = sstack[nsstack].stroke;
+	strokewidth = sstack[nsstack].strokewidth;
+	nofill = sstack[nsstack].nofill;
+	fill = sstack[nsstack].fill;
+	return 0;
+}
+
 void
 registerfunc(lua_State *L, const char *name, int(*f)(lua_State*))
 {
@@ -505,5 +548,7 @@ registerapi(lua_State *L)
 	registerfunc(L, "radians", cradians);
 	registerfunc(L, "pushMatrix", cpushmatrix);
 	registerfunc(L, "popMatrix", cpopmatrix);
+	registerfunc(L, "pushStyle", cpushstyle);
+	registerfunc(L, "popStyle", cpopstyle);
 }
 
