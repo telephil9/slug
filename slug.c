@@ -12,6 +12,9 @@ linit(int argc, char *argv[])
 	int r;
 
 	L = luaL_newstate();
+	lua_gc(L, LUA_GCGEN, 0, 0);	
+	lua_pushboolean(L, 1);
+	lua_setfield(L, LUA_REGISTRYINDEX, "LUA_NOENV");
 	luaL_openlibs(L);
 	r = luaL_dofile(L, argc > 1 ? argv[1] : NULL);
 	if(r != LUA_OK){
@@ -118,6 +121,7 @@ threadmain(int argc, char *argv[])
 	alts[0].c = mc->c;
 	alts[1].c = mc->resizec;
 	alts[2].c = kc->c;
+	setfcr(getfcr() & ~(FPZDIV | FPOVFL | FPINVAL));	
 	L = linit(argc, argv);
 	registerapi(L);
 	initstate(L);
