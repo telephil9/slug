@@ -378,6 +378,29 @@ carc(lua_State *L)
 }
 
 int
+cbezier(lua_State *L)
+{
+	Point p0, p1, p2, p3;
+	int x1, y1, x2, y2, x3, y3, x4, y4;
+
+	x1 = luaL_checkinteger(L, 1);
+	y1 = luaL_checkinteger(L, 2);
+	x2 = luaL_checkinteger(L, 3);
+	y2 = luaL_checkinteger(L, 4);
+	x3 = luaL_checkinteger(L, 5);
+	y3 = luaL_checkinteger(L, 6);
+	x4 = luaL_checkinteger(L, 7);
+	y4 = luaL_checkinteger(L, 8);
+	p0 = canvaspt(x1, y1);
+	p1 = canvaspt(x2, y2);
+	p2 = canvaspt(x3, y3);
+	p3 = canvaspt(x4, y4);
+	if(!nostroke)
+		bezier(canvas, p0, p1, p2, p3, strokecap, strokecap, strokeweight, stroke, ZP);
+	return 0;
+}
+
+int
 ctriangle(lua_State *L)
 {
 	Point p[4];
@@ -557,6 +580,7 @@ registerapi(lua_State *L)
 	registerfunc(L, "circle", ccircle);
 	registerfunc(L, "ellipse", cellipse);
 	registerfunc(L, "arc", carc);
+	registerfunc(L, "bezier", cbezier);
 	registerfunc(L, "triangle", ctriangle);
 	registerfunc(L, "quad", cquad);
 	registerfunc(L, "translate", ctranslate);
