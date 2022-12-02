@@ -14,7 +14,7 @@ struct Style
 	int		nostroke;
 	int		strokecap;
 	Image	*stroke;
-	int		strokewidth;
+	int		strokeweight;
 	int		nofill;
 	Image	*fill;
 };
@@ -34,7 +34,7 @@ int		colormode;
 int		nostroke;
 int		strokecap;
 Image	*stroke;
-int		strokewidth;
+int		strokeweight;
 int		nofill;
 Image	*fill;
 Point	origin;
@@ -62,7 +62,7 @@ initstate(lua_State *L)
 	nostroke = 0;
 	strokecap = Endsquare;
 	stroke = display->black;
-	strokewidth = 1;
+	strokeweight = 1;
 	nofill = 0;
 	fill = display->white;
 	origin = ZP;
@@ -235,12 +235,12 @@ cfill(lua_State *L)
 
 
 int
-cstrokewidth(lua_State *L)
+cstrokeweight(lua_State *L)
 {
 	int n;
 
 	n = luaL_checkinteger(L, 1);
-	strokewidth = n;
+	strokeweight = n;
 	return 0;
 }
 
@@ -253,12 +253,12 @@ cpoint(lua_State *L)
 	x = luaL_checkinteger(L, 1);
 	y = luaL_checkinteger(L, 2);
 	p1 = canvaspt(x, y);
-	p2 = canvaspt(x + strokewidth, y + strokewidth);
+	p2 = canvaspt(x + strokeweight, y + strokeweight);
 	if(!nostroke)
 		if(strokecap == Endsquare)
 			draw(canvas, Rpt(p1, p2), stroke, nil, ZP);
 		else if(strokecap == Enddisc)
-			fillellipse(canvas, p1, strokewidth/2.0, strokewidth/2.0, stroke, ZP);
+			fillellipse(canvas, p1, strokeweight/2.0, strokeweight/2.0, stroke, ZP);
 	return 0;
 }
 
@@ -275,7 +275,7 @@ cline(lua_State *L)
 	p1 = canvaspt(x1, y1);
 	p2 = canvaspt(x2, y2);
 	if(!nostroke)
-		line(canvas, p1, p2, strokecap, strokecap, strokewidth, stroke, ZP);
+		line(canvas, p1, p2, strokecap, strokecap, strokeweight, stroke, ZP);
 	return 0;
 }
 
@@ -296,7 +296,7 @@ csquare(lua_State *L)
 	if(!nofill)
 		fillpoly(canvas, p, 4, 0, fill, ZP);
 	if(!nostroke)
-		poly(canvas, p, 5, strokecap, strokecap, strokewidth, stroke, ZP);
+		poly(canvas, p, 5, strokecap, strokecap, strokeweight, stroke, ZP);
 	return 0;
 }
 
@@ -318,7 +318,7 @@ crect(lua_State *L)
 	if(!nofill)
 		fillpoly(canvas, p, 4, 0, fill, ZP);
 	if(!nostroke)
-		poly(canvas, p, 5, strokecap, strokecap, strokewidth, stroke, ZP);
+		poly(canvas, p, 5, strokecap, strokecap, strokeweight, stroke, ZP);
 	return 0;
 }
 
@@ -335,7 +335,7 @@ ccircle(lua_State *L)
 	if(!nofill)
 		fillellipse(canvas, p, a, a, fill, ZP);
 	if(!nostroke)
-		ellipse(canvas, p, a, a, strokewidth, stroke, ZP);
+		ellipse(canvas, p, a, a, strokeweight, stroke, ZP);
 	return 0;
 }
 
@@ -353,7 +353,7 @@ cellipse(lua_State *L)
 	if(!nofill)
 		fillellipse(canvas, p, a, b, fill, ZP);
 	if(!nostroke)
-		ellipse(canvas, p, a, b, strokewidth, stroke, ZP);
+		ellipse(canvas, p, a, b, strokeweight, stroke, ZP);
 	return 0;
 }
 
@@ -373,7 +373,7 @@ carc(lua_State *L)
 	if(!nofill)
 		fillarc(canvas, p, a, b, fill, ZP, c, d);
 	if(!nostroke)
-		arc(canvas, p, a, b, strokewidth, stroke, ZP, c, d);
+		arc(canvas, p, a, b, strokeweight, stroke, ZP, c, d);
 	return 0;
 }
 
@@ -396,7 +396,7 @@ ctriangle(lua_State *L)
 	if(!nofill)
 		fillpoly(canvas, p, 3, 0, fill, ZP);
 	if(!nostroke)
-		poly(canvas, p, 4, strokecap, strokecap, strokewidth, stroke, ZP);
+		poly(canvas, p, 4, strokecap, strokecap, strokeweight, stroke, ZP);
 	return 0;
 }
 
@@ -422,7 +422,7 @@ cquad(lua_State *L)
 	if(!nofill)
 		fillpoly(canvas, p, 4, 0, fill, ZP);
 	if(!nostroke)
-		poly(canvas, p, 5, strokecap, strokecap, strokewidth, stroke, ZP);
+		poly(canvas, p, 5, strokecap, strokecap, strokeweight, stroke, ZP);
 	return 0;
 
 }
@@ -485,7 +485,7 @@ cpushstyle(lua_State *L)
 	sstack[nsstack].nostroke = nostroke;
 	sstack[nsstack].strokecap = strokecap;
 	sstack[nsstack].stroke = stroke;
-	sstack[nsstack].strokewidth = strokewidth;
+	sstack[nsstack].strokeweight = strokeweight;
 	sstack[nsstack].nofill = nofill;
 	sstack[nsstack].fill = fill;
 	nsstack++;
@@ -501,7 +501,7 @@ cpopstyle(lua_State *L)
 	nostroke = sstack[nsstack].nostroke;
 	strokecap = sstack[nsstack].strokecap;
 	stroke = sstack[nsstack].stroke;
-	strokewidth = sstack[nsstack].strokewidth;
+	strokeweight = sstack[nsstack].strokeweight;
 	nofill = sstack[nsstack].nofill;
 	fill = sstack[nsstack].fill;
 	return 0;
@@ -531,7 +531,7 @@ registerapi(lua_State *L)
 	registerfunc(L, "noStroke", cnostroke);
 	registerfunc(L, "strokeCap", cstrokecap);
 	registerfunc(L, "stroke", cstroke);
-	registerfunc(L, "strokeWidth", cstrokewidth);
+	registerfunc(L, "strokeWeight", cstrokeweight);
 	registerfunc(L, "noFill", cnofill);
 	registerfunc(L, "fill", cfill);
 	registerfunc(L, "point", cpoint);
