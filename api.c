@@ -419,6 +419,16 @@ crotate(lua_State *L)
 	return 0;
 }
 
+int
+cradians(lua_State *L)
+{
+	int a;
+
+	a = luaL_checkinteger(L, 1);
+	lua_pushnumber(L, a*PI/180.0);
+	return 1;
+}
+
 void
 registerfunc(lua_State *L, const char *name, int(*f)(lua_State*))
 {
@@ -457,5 +467,6 @@ registerapi(lua_State *L)
 	registerfunc(L, "quad", cquad);
 	registerfunc(L, "transpose", ctranspose);
 	registerfunc(L, "rotate", crotate);
+	registerfunc(L, "radians", cradians);
 }
 
