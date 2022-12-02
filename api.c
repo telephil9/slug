@@ -341,8 +341,8 @@ carc(lua_State *L)
 	y = luaL_checkinteger(L, 2);
 	a = luaL_checkinteger(L, 3);
 	b = luaL_checkinteger(L, 4);
-	c = luaL_checkinteger(L, 5);
-	d = luaL_checkinteger(L, 6);
+	c = luaL_checknumber(L, 5) * 180.0/PI;
+	d = luaL_checknumber(L, 6) * 180.0/PI;
 	p = canvaspt(x, y);
 	if(!nofill)
 		fillarc(canvas, p, a, b, fill, ZP, c, d);
