@@ -13,6 +13,7 @@ void	resize(lua_State*, int, int);
 
 void	drawcanvas(void);
 void	initstate(lua_State*);
+void	reset(void);
 void	registerapi(lua_State*);
 
 Image*	color(int, int, int, int);

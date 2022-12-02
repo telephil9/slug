@@ -131,6 +131,7 @@ threadmain(int argc, char *argv[])
 	drawing = 1;
 	for(;;){
 		if(looping){
+			reset();
 			t0 = nsec();
 			lcall(L, "draw");
 			t1 = nsec();

@@ -46,6 +46,13 @@ initstate(lua_State *L)
 }
 
 void
+reset(void)
+{
+	origin = ZP;
+	angle = 0.0;
+}
+
+void
 drawcanvas(void)
 {
 	draw(screen, screen->r, canvas, nil, ZP);
