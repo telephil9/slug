@@ -92,6 +92,39 @@ Sets the color used to draw the lines and borders around shapes
 .TP
 \f5noStroke()
 Disable shapes outline
+.TP
+\f5color(\f2v1\fP, \f2v2\fP, \f2v3\fP)
+Creates a color object which is an lua table with r, g, and b fields.
+The parameters are affected by the current color mode, meaning they will be interpreted as either RGB or HSB.
+.SS Image
+.TP
+\f5pixels[]
+The
+.I pixels[]
+array gives direct access to the canvas pixels. 
+.I pixels[]
+is an array of size
+.I width x height
+where each individual element is a color object obtained with the
+.I color
+function.
+Before accessing the array, the data must be loaded using the
+.I loadPixels()
+functions. To reflect the changes to the 
+.I pixels[]
+array, the function
+.I updatePixels()
+must be called. Accessing the array without these calls will have no effect on the canvas image.
+.TP
+\f5loadPixels()
+Loads the canvas image pixels into the
+.I pixels[]
+array.
+.TP
+\f5updatePixels()
+Update the canvas image content with the data in the
+.I pixels[]
+array.
 .SS Shape
 .TP
 \f5arc(\f2x\fP, \f2y\fP, \f2width\fP, \f2height\fP, \f2start\fP, \f2stop\fP)
