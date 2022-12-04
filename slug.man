@@ -1,0 +1,275 @@
+.TH SLUG 1
+.SH NAME
+slug \- visual programming in lua
+
+.SH SYNOPSIS
+.B slug
+[
+.I file
+]
+
+.SH DESCRIPTION
+.PP
+.I slug
+executes the lua script
+.I file
+and will first call, if it exists, the
+.IR setup
+function and then call the
+.IR draw
+function in a loop.
+All available variables and functions are detailed in the sections below.
+.SS Structure
+.TP
+\f5setup()
+.I Setup
+is called once when the script is started. It is useful to do some initialization like setting the canvas size.
+.TP
+\f5draw()
+.I Draw
+is called directly after
+.I setup()
+and is run in a loop until program exits or
+.I noLoop()
+is called.
+.TP
+\f5noLoop()
+Disables the animation loop, meaning that 
+.IR draw
+will only be called once. This function should be called from 
+.IR draw
+to ensure it is called at least once.
+.TP
+\f5loop()
+Enables the animation loop.
+.SS Color
+.PP
+All color related functions accept either one or three arguments. If a single number is passed it is used as a shade of gray from black (0) to white (255). If three arguments are passed they are used as either an RGB (default) or HSB triplet. This can be changed with the
+.I colorMode
+function.
+.TP
+\f5colorMode(\f2mode\fP)
+Change the interpretation of color parameters.
+.PD 0
+.I mode
+can have the following values:
+.PD 0
+.TP
+.B RGB
+colors are defined by a combination of red, green and blue each in the range [0;255]
+.PD 0
+.TP
+.B HSB
+colors are defined by their hue (range [0;360]), saturation (range [0;100]) and brightness (range [0;100])
+.PD
+.TP
+\f5background(\f2gray\fP)
+.PD 0
+.TP
+\f5background(\f2v1\fP, \f2v2\fP, \f2v3\fP)
+Sets the background color of the
+.IR slug
+canvas.
+.PD
+.TP
+\f5fill(\f2gray\fP)
+.PD 0
+.TP
+\f5fill(\f2v1\fP, \f2v2\fP, \f2v3\fP)
+Sets the color used to fill shapes
+.PD
+.TP
+\f5noFill()
+Disable filling shapes
+.PD
+.TP
+\f5stroke(\f2gray\fP)
+.PD 0
+.TP
+\f5stroke(\f2v1\fP, \f2v2\fP, \f2v3\fP)
+Sets the color used to draw the lines and borders around shapes
+.PD
+.TP
+\f5noStroke()
+Disable shapes outline
+.SS Shape
+.TP
+\f5arc(\f2x\fP, \f2y\fP, \f2width\fP, \f2height\fP, \f2start\fP, \f2stop\fP)
+Arc draws an arc centered on point
+.I (x,y)
+using an horizontal radius of size
+.I width
+and a vertical radius of size
+.I height
+.TP
+\f5circle(\f2x\fP, \f2y\fP, \f2radius\fP)
+Draws a circle centered on point
+.I (x,y)
+with a radius of size
+.I radius
+.TP
+\f5ellipse(\f2x\fP, \f2y\fP, \f2a\fP, \f2b\fP)
+Draws an ellipse centered on point
+.I (x,y)
+with an horizontal radius of size
+.I a
+and a vertical radius of size
+.I b
+.TP
+\f5line(\f2x1\fP, \f2y1\fP, \f2x2\fP, \f2y2\fP)
+Draws a line between points
+.I (x1,y1)
+and
+.I (x2,y2)
+.TP
+\f5point(\f2x\fP, \f2y\fP)
+Draws a point at
+.I (x,y)
+.TP
+\f5square(\f2x\fP, \f2y\fP, \f2a\fP)
+Draws a square on the canvas. The top-left corner of the square is set at point
+.I (x,y)
+The length of the sides is defined by the
+.I a
+parameter
+.TP
+\f5rect(\f2x\fP, \f2y\fP, \f2w\fP, \f2h\fP)
+Draws a rectangle on the canvas. The left-left corner of the rectanglee is set at point
+.I (x,y)
+The width and height of the rectangle are defined by the
+.I w
+and
+.I h
+parameters.
+.TP
+\f5quad(\f2x1\fP, \f2y1\fP, \f2x2\fP, \f2y2\fP, \f2x3\fP, \f2y3\fP, \f2x4\fP, \f2y4\fP)
+Draws a quadrilateral (i.e. a four-sided polygon)
+.TP
+\f5triangle(\f2x1\fP, \f2y1\fP, \f2x2\fP, \f2y2\fP, \f2x3\fP, \f2y3\fP)
+Draws a triangle
+.TP
+\f5bezier(\f2x1\fP, \f2y1\fP, \f2x2\fP, \f2y2\fP, \f2x3\fP, \f2y3\fP, \f2x4\fP, \f2y4\fP)
+Draws a cubic Bezier curve defined by the points
+.I (x1,y1)
+.I (x2,y2)
+.I (x3,y3)
+.I (x4,y4)
+.SS Attributes
+The following functions control the attributes of shapes drawing.
+.TP
+\f5strokeWeight(\f2w\fP)
+Sets the width of the stroke used for points, lines and border around shapes.
+.TP
+\f5strokeCap(\f2a\fP)
+Sets the style of rendering for line endings. The
+.I a
+parameter can be either
+.I SQUARE
+which is the default
+or
+.I ROUND
+.SS Transform
+.TP
+\f5translate(\f2x\fP, \f2y\fP)
+Specifies the displacement of points in the canvas. The
+.x
+parameter specifies the horizontal translation, the
+.y
+parameter specifies the vertical one.
+.PD 0
+.TP
+.B NB:
+Transformations are cumulative which means that subsequent calls to
+.IR translate
+accumulates the translation.
+.PD
+.TP
+\f5rotate(\f2angle\fP)
+Specifies the angle by which shapes are rotated when drawn on canvas. The
+.I angle
+parameter is expressed in radians (it can be converted from degrees by using the
+.IR radians()
+function).
+.PD 0
+.TP
+.B NB:
+Transformations are cumulative which means that subsequent calls to
+.IR rotate
+increase the rotation.
+.PD
+.TP
+\f5pushMatrix()
+Pushes the current transformation matrix onto the matrix stack. This saves the current coordinate system (translations and rotations) on the stack and allows to control the scope of transformations.
+.PD
+.TP
+\f5popMatrix()
+Pops the transformation matrix off the stack. This restores the coordinate system to its state before the last call to
+.I pushMatrix
+.SS Environment
+.TP
+\f5pushStyle()
+Saves all style related settings (
+.IR strokeWeight
+,
+.IR strokeCap
+,
+\&...
+).
+.TP
+\f5popStyle()
+Restores all style related settings previously saved by a call to
+.IR pushStyle
+\&.
+.TP
+\f5push()
+Convenient helper that saves both the style settings and the transformation matrix.
+.TP
+\f5pop()
+Restore style settings and transformation matrix previously saved by a call to
+.IR push
+\&.
+.TP
+\f5width
+Global variable set to the 
+.IR width
+of the canvas.
+.TP
+\f5height
+Global variable set to the
+.IR height
+of the canvas.
+.TP
+\f5size(\f2width\fP, \f2height\fP)
+Sets the size of the 
+.IR slug
+canvas to 
+.I width
+x
+.I height
+\&.
+.I size
+can only be used from the
+.IR setup
+function and will have no effect if called from 
+.IR draw
+\&.
+.TP
+\f5frameRate(\f2v\fP)
+Sets the number of frames per seconds for the draw loop. By default
+.IR slug
+uses 90 FPS.
+.SS Input
+.TP
+\f5mouseX
+Global variable containing the horizontal coordinate of the mouse.
+.TP
+\f5mouseY
+Global variable containing the vertical coordinate of the mouse.
+
+.SH AUTHOR
+phil9
+
+.SH LICENSE
+MIT
+
+
