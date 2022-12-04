@@ -1,5 +1,6 @@
 #include "a.h"
 
+int mainstacksize=16384;
 Mousectl *mc;
 Keyboardctl *kc;
 int drawing;
