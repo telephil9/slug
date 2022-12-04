@@ -40,7 +40,6 @@ Image	*fill;
 Point	origin;
 double	angle;
 
-
 Tmatrix tstack[255] = {0};
 int ntstack;
 Style sstack[255] = {0};
@@ -69,6 +68,7 @@ initstate(lua_State *L)
 	angle = 0.0;
 	lset(L, "mouseX", 0);
 	lset(L, "mouseY", 0);
+	lpushpixels(L);
 }
 
 void
@@ -138,6 +138,7 @@ csize(lua_State *L)
 	height = h;
 	freeimage(canvas);
 	canvas = allocimage(display, Rect(0, 0, w, h), screen->chan, 0, DNofill);
+	lpushpixels(L);
 	resize(L, w, h);
 	return 0;
 }
@@ -546,6 +547,51 @@ cpop(lua_State *L)
 	return 0;
 }
 
+int
+ccolor(lua_State *L)
+{
+	int r, g, b;
+
+	r = luaL_checkinteger(L, 1);
+	g = luaL_checkinteger(L, 2);
+	b = luaL_checkinteger(L, 3);
+	if(colormode == Chsv)
+		hsvtorgb(r, g, b, &r, &g, &b);
+	lua_newtable(L);
+	lua_pushinteger(L, r);
+	lua_setfield(L, -2, "r");
+	lua_pushinteger(L, g);
+	lua_setfield(L, -2, "g");
+	lua_pushinteger(L, b);
+	lua_setfield(L, -2, "b");
+	return 1;
+}
+
+
+int
+cloadpixels(lua_State *L)
+{
+	char ebuf[ERRMAX];
+
+	if(unloadimage(canvas, canvas->r, pixels->data, pixels->ndata) < 0){
+		errstr(ebuf, sizeof ebuf);
+		return luaL_error(L, "unable to load pixels: %s", ebuf);
+	}
+	return 0;
+}
+
+int
+cupdatepixels(lua_State *L)
+{
+	char ebuf[ERRMAX];
+
+	if(loadimage(canvas, canvas->r, pixels->data, pixels->ndata) < 0){
+		errstr(ebuf, sizeof ebuf);
+		return luaL_error(L, "unable to update pixels: %s", ebuf);
+	}
+	return 0;
+}
+
 void
 registerfunc(lua_State *L, const char *name, int(*f)(lua_State*))
 {
@@ -592,5 +638,8 @@ registerapi(lua_State *L)
 	registerfunc(L, "popStyle", cpopstyle);
 	registerfunc(L, "push", cpush);
 	registerfunc(L, "pop", cpop);
+	registerfunc(L, "color", ccolor);
+	registerfunc(L, "loadPixels", cloadpixels);
+	registerfunc(L, "updatePixels", cupdatepixels);
 }
 

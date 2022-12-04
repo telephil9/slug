@@ -17,6 +17,9 @@ linit(int argc, char *argv[])
 	lua_pushboolean(L, 1);
 	lua_setfield(L, LUA_REGISTRYINDEX, "LUA_NOENV");
 	luaL_openlibs(L);
+	registerapi(L);
+	registerpixels(L);
+	initstate(L);
 	r = luaL_dofile(L, argc > 1 ? argv[1] : NULL);
 	if(r != LUA_OK){
 		s = luaL_checkstring(L, lua_gettop(L));
@@ -124,8 +127,6 @@ threadmain(int argc, char *argv[])
 	alts[2].c = kc->c;
 	setfcr(getfcr() & ~(FPZDIV | FPOVFL | FPINVAL));	
 	L = linit(argc, argv);
-	registerapi(L);
-	initstate(L);
 	resize(L, width, height);
 	drawing = 0;
 	lcall(L, "setup");
