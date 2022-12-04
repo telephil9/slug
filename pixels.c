@@ -31,11 +31,11 @@ pixelsget(lua_State *L)
 	luaL_argcheck(L, 1 <= i && i <= (width*height), 2, "index out of range");
 	i = (i-1)*4;
 	lua_newtable(L);
-	lua_pushinteger(L, p->data[i]);
+	lua_pushinteger(L, p->data[i+2]);
 	lua_setfield(L, -2, "r");
 	lua_pushinteger(L, p->data[i+1]);
 	lua_setfield(L, -2, "g");
-	lua_pushinteger(L, p->data[i+2]);
+	lua_pushinteger(L, p->data[i+0]);
 	lua_setfield(L, -2, "b");
 	return 1;
 }
@@ -61,9 +61,9 @@ pixelsset(lua_State *L)
 	lua_gettable(L, 3);
 	b = luaL_checkinteger(L, -1);
 	i = (i-1)*4;
-	p->data[i + 0] = r;
+	p->data[i + 2] = r;
 	p->data[i + 1] = g;
-	p->data[i + 2] = b;
+	p->data[i + 0] = b;
 	return 0;
 }
 
