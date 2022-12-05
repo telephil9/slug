@@ -96,6 +96,17 @@ Disable shapes outline
 \f5color(\f2v1\fP, \f2v2\fP, \f2v3\fP)
 Creates a color object which is an lua table with r, g, and b fields.
 The parameters are affected by the current color mode, meaning they will be interpreted as either RGB or HSB.
+.TP
+\f5lerpColor(\f2c1\fP, \f2c2\fP, \f2amt\fP)
+Compute a
+.I color
+by interpolating colors
+.I c1
+and
+.I c2
+linearly by 
+.I amt
+\&.
 .SS Image
 .TP
 \f5pixels[]

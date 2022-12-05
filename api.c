@@ -143,6 +143,32 @@ csize(lua_State *L)
 	return 0;
 }
 
+void
+checkcolor(lua_State *L, int index, int *r, int *g, int *b)
+{
+	lua_pushstring(L, "r");
+	lua_gettable(L, index);
+	*r = luaL_checkinteger(L, -1);
+	lua_pushstring(L, "g");
+	lua_gettable(L, index);
+	*g = luaL_checkinteger(L, -1);
+	lua_pushstring(L, "b");
+	lua_gettable(L, index);
+	*b = luaL_checkinteger(L, -1);
+}
+
+void
+pushcolor(lua_State *L, int r, int g, int b)
+{
+	lua_newtable(L);
+	lua_pushinteger(L, r);
+	lua_setfield(L, -2, "r");
+	lua_pushinteger(L, g);
+	lua_setfield(L, -2, "g");
+	lua_pushinteger(L, b);
+	lua_setfield(L, -2, "b");
+}
+
 Image*
 getcolor(lua_State *L)
 {
@@ -151,21 +177,10 @@ getcolor(lua_State *L)
 
 	c = lua_gettop(L);
 	if(c == 1){
-		if(lua_istable(L, 1)){
-			lua_pushstring(L, "r");
-			lua_gettable(L, 1);
-			r = luaL_checkinteger(L, -1);
-			lua_pushstring(L, "g");
-			lua_gettable(L, 1);
-			g = luaL_checkinteger(L, -1);
-			lua_pushstring(L, "b");
-			lua_gettable(L, 1);
-			b = luaL_checkinteger(L, -1);
-		}else{
-			r = luaL_checkinteger(L, 1);
-			g = r;
-			b = r;
-		}
+		if(lua_istable(L, 1))
+			checkcolor(L, 1, &r, &g, &b);
+		else
+			r = g = b = luaL_checkinteger(L, 1);
 		i = color(r, g, b, 0);
 	}else if(c == 3){
 		r = luaL_checkinteger(L, 1);
@@ -571,16 +586,29 @@ ccolor(lua_State *L)
 	b = luaL_checkinteger(L, 3);
 	if(colormode == Chsv)
 		hsvtorgb(r, g, b, &r, &g, &b);
-	lua_newtable(L);
-	lua_pushinteger(L, r);
-	lua_setfield(L, -2, "r");
-	lua_pushinteger(L, g);
-	lua_setfield(L, -2, "g");
-	lua_pushinteger(L, b);
-	lua_setfield(L, -2, "b");
+	pushcolor(L, r, g, b);
 	return 1;
 }
 
+int
+clerpcolor(lua_State *L)
+{
+	int r0, g0, b0, r1, g1, b1, r, g, b;
+	double f;
+
+	checkcolor(L, 1, &r0, &g0, &b0);
+	checkcolor(L, 2, &r1, &g1, &b1);
+	f = luaL_checknumber(L, 3);
+	if(f < 0.0)
+		f = 0.0;
+	else if(f > 1.0)
+		f = 1.0;
+	r = f * (r1 - r0) + r0;
+	g = f * (g1 - g0) + g0;
+	b = f * (b1 - b0) + b0;
+	pushcolor(L, r, g, b);
+	return 1;
+}
 
 int
 cloadpixels(lua_State *L)
@@ -678,6 +706,7 @@ registerapi(lua_State *L)
 	registerfunc(L, "push", cpush);
 	registerfunc(L, "pop", cpop);
 	registerfunc(L, "color", ccolor);
+	registerfunc(L, "lerpColor", clerpcolor);
 	registerfunc(L, "loadPixels", cloadpixels);
 	registerfunc(L, "updatePixels", cupdatepixels);
 	registerfunc(L, "randomGaussian", crandomgaussian);
