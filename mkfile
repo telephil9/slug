@@ -4,7 +4,7 @@ BIN=/$objtype/bin
 TARG=slug
 LIB=lua/liblua.a.$O
 HFILES=a.h
-OFILES=slug.$O api.$O color.$O pixels.$O
+OFILES=slug.$O api.$O color.$O pixels.$O math.$O
 MAN=/sys/man/1
 
 </sys/src/cmd/mkone

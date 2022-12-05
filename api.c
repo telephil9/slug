@@ -592,6 +592,31 @@ cupdatepixels(lua_State *L)
 	return 0;
 }
 
+int
+crandomgaussian(lua_State *L)
+{
+	double m, s, g;
+	int n;
+
+	m = 0.0;
+	s = 1.0;
+	n = lua_gettop(L);
+	switch(n){
+	case 2:
+		s = luaL_checknumber(L, 2);
+	case 1:
+		m = luaL_checknumber(L, 1);
+		break;
+	case 0:
+		break;
+	default:
+		luaL_error(L, "invalid argument count");
+	}
+	g = randomgaussian(m, s);
+	lua_pushnumber(L, g);
+	return 1;
+}
+
 void
 registerfunc(lua_State *L, const char *name, int(*f)(lua_State*))
 {
@@ -641,5 +666,6 @@ registerapi(lua_State *L)
 	registerfunc(L, "color", ccolor);
 	registerfunc(L, "loadPixels", cloadpixels);
 	registerfunc(L, "updatePixels", cupdatepixels);
+	registerfunc(L, "randomGaussian", crandomgaussian);
 }
 

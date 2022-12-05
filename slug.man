@@ -298,6 +298,16 @@ Global variable containing the horizontal coordinate of the mouse.
 .TP
 \f5mouseY
 Global variable containing the vertical coordinate of the mouse.
+.SS Math
+.TP
+\f5randomGaussian()
+.PD 0
+.TP
+\f5randomGaussian(\f2mean\fP)
+.PD 0
+.TP
+\f5randomGaussian(\f2mean\fP, \f2stddev\fP)
+Returns a random number fitting a Gaussian (or normal) distribution. The arguments are the mean and the standard deviation which defaults to 0.0 and 1.0 respectively.
 
 .SH AUTHOR
 phil9

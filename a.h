@@ -30,6 +30,8 @@ Image*	color(int, int, int, int);
 int		registerpixels(lua_State*);
 void	lpushpixels(lua_State*);
 
+double	randomgaussian(double, double);
+
 extern int		drawing;
 extern int		looping;
 extern int		framerate;
