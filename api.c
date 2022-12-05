@@ -151,8 +151,22 @@ getcolor(lua_State *L)
 
 	c = lua_gettop(L);
 	if(c == 1){
-		g = luaL_checkinteger(L, 1);
-		i = color(g, g, g, 0);
+		if(lua_istable(L, 1)){
+			lua_pushstring(L, "r");
+			lua_gettable(L, 1);
+			r = luaL_checkinteger(L, -1);
+			lua_pushstring(L, "g");
+			lua_gettable(L, 1);
+			g = luaL_checkinteger(L, -1);
+			lua_pushstring(L, "b");
+			lua_gettable(L, 1);
+			b = luaL_checkinteger(L, -1);
+		}else{
+			r = luaL_checkinteger(L, 1);
+			g = r;
+			b = r;
+		}
+		i = color(r, g, b, 0);
 	}else if(c == 3){
 		r = luaL_checkinteger(L, 1);
 		g = luaL_checkinteger(L, 2);
