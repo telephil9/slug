@@ -737,7 +737,7 @@ clerp(lua_State *L)
 	a = luaL_checknumber(L, 1);
 	b = luaL_checknumber(L, 2);
 	r = luaL_checknumber(L, 3);
-	lua_pushnumber(L, lerp(a, b, r));
+	lua_pushnumber(L, lerp(r, a, b));
 	return 1;
 }
 
@@ -763,6 +763,17 @@ crandomgaussian(lua_State *L)
 	}
 	g = randomgaussian(m, s);
 	lua_pushnumber(L, g);
+	return 1;
+}
+
+int
+cnoise(lua_State *L)
+{
+	double x, y;
+
+	x = luaL_checknumber(L, 1);
+	y = luaL_optnumber(L, 2, 0.0);
+	lua_pushnumber(L, noise(x, y, 0.0));
 	return 1;
 }
 
@@ -831,4 +842,5 @@ registerapi(lua_State *L)
 	registermathfunc(L, "norm", cnorm);
 	registermathfunc(L, "lerp", clerp);
 	registermathfunc(L, "randomGaussian", crandomgaussian);
+	registermathfunc(L, "noise", cnoise);
 }

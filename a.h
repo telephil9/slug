@@ -34,6 +34,7 @@ double	dist(int, int, int, int);
 double	map(double, double, double, double, double);
 double	lerp(double, double, double);
 double	randomgaussian(double, double);
+double	noise(double, double, double);
 
 extern int		drawing;
 extern int		looping;
