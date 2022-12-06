@@ -477,7 +477,6 @@ cquad(lua_State *L)
 	if(!nostroke)
 		poly(canvas, p, 5, strokecap, strokecap, strokeweight, stroke, ZP);
 	return 0;
-
 }
 
 int
@@ -635,6 +634,114 @@ cupdatepixels(lua_State *L)
 }
 
 int
+cconstrain(lua_State *L)
+{
+	double fa, fm, fM;
+	int ia, im, iM;
+
+	if(lua_isinteger(L, 1)){
+		ia = luaL_checkinteger(L, 1);
+		im = luaL_checkinteger(L, 2);
+		iM = luaL_checkinteger(L, 3);
+		if(ia < im)
+			ia = im;
+		else if(ia > iM)
+			ia = iM;
+		lua_pushinteger(L, ia);
+	}else{
+		fa = luaL_checknumber(L, 1);
+		fm = luaL_checknumber(L, 2);
+		fM = luaL_checknumber(L, 3);
+		if(fa < fm)
+			fa = fm;
+		else if(fa > fM)
+			fa = fM;
+		lua_pushnumber(L, fa);
+	}
+	return 1;
+}
+
+int
+cmap(lua_State *L)
+{
+	double v, s1, e1, s2, e2;
+	int n;
+
+	n = lua_gettop(L);
+	if(n != 5)
+		return luaL_error(L, "invalid argument count (expected 5 but got %d)", n);
+	v = luaL_checknumber(L, 1);
+	s1 = luaL_checknumber(L, 2);
+	e1 = luaL_checknumber(L, 3);
+	s2 = luaL_checknumber(L, 4);
+	e2 = luaL_checknumber(L, 5);
+	lua_pushnumber(L, map(v, s1, e1, s2, e2));
+	return 1;
+}
+
+int
+cnorm(lua_State *L)
+{
+	double v, s1, e1;
+	int n;
+
+	n = lua_gettop(L);
+	if(n != 3)
+		return luaL_error(L, "invalid argument count (expected 3 but got %d)", n);
+	v = luaL_checknumber(L, 1);
+	s1 = luaL_checknumber(L, 2);
+	e1 = luaL_checknumber(L, 3);
+	lua_pushnumber(L, map(v, s1, e1, 0.0, 1.0));
+	return 1;
+}
+
+int
+cdist(lua_State *L)
+{
+	int n, x1, y1, x2, y2;
+	
+	n = lua_gettop(L);
+	if(n != 4)
+		return luaL_error(L, "invalid argument count (expected 4 but got %d)", n);
+	x1 = luaL_checkinteger(L, 1);
+	y1 = luaL_checkinteger(L, 2);
+	x2 = luaL_checkinteger(L, 3);
+	y2 = luaL_checkinteger(L, 4);
+	lua_pushnumber(L, dist(x1, y1, x2, y2));
+	return 1;
+}
+
+int
+cmag(lua_State *L)
+{
+	int n, x, y;
+
+	n = lua_gettop(L);
+	if(n != 2)
+		return luaL_error(L, "invalid argument count (expected 2 but got %d)", n);
+	x = luaL_checkinteger(L, 1);
+	y = luaL_checkinteger(L, 2);
+	lua_pushnumber(L, dist(0, 0, x, y));
+	return 1;
+}
+
+int
+clerp(lua_State *L)
+{
+	double r, a, b;
+	int n;
+
+	n = lua_gettop(L);
+	if(n != 3)
+		return luaL_error(L, "invalid argument count (expected 3 but got %d)", n);
+	a = luaL_checknumber(L, 1);
+	b = luaL_checknumber(L, 2);
+	r = luaL_checknumber(L, 3);
+	lua_pushnumber(L, lerp(a, b, r));
+	return 1;
+}
+
+int
 crandomgaussian(lua_State *L)
 {
 	double m, s, g;
@@ -664,6 +771,14 @@ registerfunc(lua_State *L, const char *name, int(*f)(lua_State*))
 {
 	lua_pushcfunction(L, f);
 	lua_setglobal(L, name);
+}
+
+void
+registermathfunc(lua_State *L, const char *name, lua_CFunction f)
+{
+	lua_getglobal(L, "math");
+	lua_pushcfunction(L, f);
+	lua_setfield(L, 1, name);
 }
 
 void
@@ -709,6 +824,11 @@ registerapi(lua_State *L)
 	registerfunc(L, "lerpColor", clerpcolor);
 	registerfunc(L, "loadPixels", cloadpixels);
 	registerfunc(L, "updatePixels", cupdatepixels);
-	registerfunc(L, "randomGaussian", crandomgaussian);
+	registermathfunc(L, "dist", cdist);
+	registermathfunc(L, "mag", cmag);
+	registermathfunc(L, "constrain", cconstrain);
+	registermathfunc(L, "map", cmap);
+	registermathfunc(L, "norm", cnorm);
+	registermathfunc(L, "lerp", clerp);
+	registermathfunc(L, "randomGaussian", crandomgaussian);
 }
-

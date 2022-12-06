@@ -310,14 +310,70 @@ Global variable containing the horizontal coordinate of the mouse.
 \f5mouseY
 Global variable containing the vertical coordinate of the mouse.
 .SS Math
+Following functions extend the standard lua
+.I math
+library.
 .TP
-\f5randomGaussian()
+\f5math.dist(\f2x1\fP, \f2y1\fP, \f2x2\fP, \f2y2\fP)
+Computes the distance between points
+.I (x1,y1)
+and
+.I (x2, y2)
+\&.
+.TP
+\f5math.map(\f2x\fP, \f2y\fP)
+Computes the magnitude of the vector
+.I (x,y)
+\&. This is equivalent to the distance of point
+.I (x,y)
+to the origin
+.I (0,0)
+.TP
+\f5math.constrain(\f2v\fP, \f2min\fP, \f2max\fP)
+Constrains the value
+.I v
+to the range
+.I [min;max]
+\&.
+.TP
+\f5math.map(\f2v\fP, \f2s1\fP, \f2e1\fP, \f2s2\fP, \f2e2\fP)
+Maps the number
+.I v
+from the range
+.I [s1;e1]
+to the range
+.I [s2;e2]
+\&. Note that the result is not constrained to the target range which, if needed, can be achieved by a call to
+.IR constrain()
+\&.
+.TP
+\f5math.norm(\f2v\fP, \f2s\fP, \f2e\fP)
+Normalizes the value
+.I v
+from range
+.I [s;e]
+to a value in the range
+.I [0;1]
+\&. This is equivalent to:
+.I math.map(v, s, e, 0.0, 1.0)
+\&.
+.TP
+\f5math.lerp(\f2a\fP, \f2b\fP, \f2r\fP)
+Computes a linear interpolation between numbers
+.I a
+and
+.I b
+using an interpolation value of
+.I r
+\&.
+.TP
+\f5math.randomGaussian()
 .PD 0
 .TP
-\f5randomGaussian(\f2mean\fP)
+\f5math.randomGaussian(\f2mean\fP)
 .PD 0
 .TP
-\f5randomGaussian(\f2mean\fP, \f2stddev\fP)
+\f5math.randomGaussian(\f2mean\fP, \f2stddev\fP)
 Returns a random number fitting a Gaussian (or normal) distribution. The arguments are the mean and the standard deviation which defaults to 0.0 and 1.0 respectively.
 
 .SH AUTHOR
